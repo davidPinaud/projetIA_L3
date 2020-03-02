@@ -42,7 +42,7 @@ public class Menu extends BorderPane{
 		
 		// code for button Jouer placement, font and listener
 		boutonJouer.setOnAction((event)->{
-			stage.setScene(new Scene(new GamePane(stage)));
+			stage.setScene(new Scene(new choiceTypeGame(stage)));
 		});
 		boutonJouer.setFont(Font.font("Verdana",20));
 		boutonJouer.setMinWidth(150);
