@@ -3,11 +3,9 @@ package views;
 import java.util.Vector;
 
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -22,7 +20,6 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import jeu.Case;
 import jeu.Game;
@@ -235,7 +232,7 @@ public class GamePane extends HBox {
 
 			}
 
-			else {
+			else {//else joueur 2
 //				System.out.println(5);
 				if (game.getPlayer2().getToken().contentEquals("blue")) {
 //					System.out.println(6);
@@ -335,7 +332,7 @@ public class GamePane extends HBox {
 				}
 			}
 
-			return true;
+			return howManyTokens<6;
 		}
 
 		public int whichLinetoPutToken(int colonne) {
