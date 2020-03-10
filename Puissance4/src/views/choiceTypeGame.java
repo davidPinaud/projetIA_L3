@@ -48,7 +48,7 @@ public class choiceTypeGame extends BorderPane {
 
 		// code humain contre humain
 		boutonHumainContreHumain.setOnAction((event) -> {
-			stage.setScene(new Scene(new GamePane(stage)));
+			stage.setScene(new Scene(new NameView(stage)));
 		});
 		this.boutonHumainContreHumain.setFont(Font.font("Verdana", 20));
 		this.boutonHumainContreHumain.setMinWidth(150);

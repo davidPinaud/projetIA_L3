@@ -36,11 +36,14 @@ public class GamePane extends HBox {
 	private Label scorePlayer1=new Label("");
 	private Label scorePlayer2=new Label("");
 	private Label quiAGagne=new Label("");
+	private String pseudo1,pseudo2;
 
 	private static final int TAILLEFENETRELARGEUR = 1375;
 	private static final int TAILLEFENETRELONGUEUR = 925;
 
-	public GamePane(Stage stage) {
+	public GamePane(Stage stage, String pseudo1, String pseudo2) {
+		this.pseudo1=pseudo1;
+		this.pseudo2=pseudo2;
 		stage.setHeight(TAILLEFENETRELONGUEUR);
 		stage.setWidth(TAILLEFENETRELARGEUR);
 		// Background image
@@ -60,8 +63,8 @@ public class GamePane extends HBox {
 		
 		
 		//code for label
-		scorePlayer1.setText("Score joueur 1 : "+game.getPlayer1().getScore());
-		scorePlayer2.setText("Score joueur 2 : "+game.getPlayer2().getScore());
+		scorePlayer1.setText(pseudo1+" : "+game.getPlayer1().getScore());
+		scorePlayer2.setText(pseudo2+" : "+game.getPlayer2().getScore());
 		scorePlayer1.setFont(Font.font("Verdana", 30));
 		scorePlayer2.setFont(Font.font("Verdana", 30));
 		flow.getChildren().add(this.scorePlayer1);
@@ -161,7 +164,7 @@ public class GamePane extends HBox {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-						System.out.println(game.isFinished());
+						//System.out.println(game.isFinished());
 //						System.out.println(game.getGrid().getCase(5, 6));
 //						System.out.println(game.getGrid().getCase(4, 6));
 //						System.out.println(game.getGrid().getCase(3, 6));
@@ -169,11 +172,11 @@ public class GamePane extends HBox {
 //						System.out.println(game.getGrid().getCase(1, 6));
 //						System.out.println(game.getGrid().getCase(0, 6));
 						if(game.isFinished()) {
-							quiAGagne.setText("Le joueur 1 a gagné");
+							quiAGagne.setText(pseudo1+" a gagné");
 							quiAGagne.setFont(Font.font("Verdana", 30));
 							game.getPlayer1().incrementScore(1);
-							scorePlayer1.setText("Score joueur 1 : "+game.getPlayer1().getScore());
-							scorePlayer2.setText("Score joueur 2 : "+game.getPlayer2().getScore());
+							scorePlayer1.setText(pseudo1+" : "+game.getPlayer1().getScore());
+							scorePlayer2.setText(pseudo2+" : "+game.getPlayer2().getScore());
 							game=new Game(game.getPlayer1(),game.getPlayer2());
 							cases=new Vector<Case>();
 							gridSetup();
@@ -209,7 +212,7 @@ public class GamePane extends HBox {
 						}
 						System.out.println(game.isFinished());
 						if(game.isFinished()) {
-							quiAGagne.setText("Le joueur 1 a gagné");
+							quiAGagne.setText(pseudo1+" a gagné");
 							quiAGagne.setFont(Font.font("Verdana", 30));
 							game.getPlayer1().incrementScore(1);
 							game=new Game(game.getPlayer1(),game.getPlayer2());
@@ -219,8 +222,8 @@ public class GamePane extends HBox {
 								grid.getChildren().add(i.getImageView());
 							}
 							
-							scorePlayer1.setText("Score joueur 1 : "+game.getPlayer1().getScore());
-							scorePlayer2.setText("Score joueur 2 : "+game.getPlayer2().getScore());
+							scorePlayer1.setText(pseudo1+" : "+game.getPlayer1().getScore());
+							scorePlayer2.setText(pseudo2+" : "+game.getPlayer2().getScore());
 							
 						}
 						
@@ -250,9 +253,9 @@ public class GamePane extends HBox {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-						System.out.println(game.isFinished());
+						//System.out.println(game.isFinished());
 						if(game.isFinished()) {
-							quiAGagne.setText("Le joueur 2 a gagné");
+							quiAGagne.setText(pseudo2+" a gagné");
 							quiAGagne.setFont(Font.font("Verdana", 30));
 							game.getPlayer2().incrementScore(1);
 							game=new Game(game.getPlayer1(),game.getPlayer2());
@@ -262,8 +265,8 @@ public class GamePane extends HBox {
 								grid.getChildren().add(i.getImageView());
 							}
 							
-							scorePlayer1.setText("Score joueur 1 : "+game.getPlayer1().getScore());
-							scorePlayer2.setText("Score joueur 2 : "+game.getPlayer2().getScore());
+							scorePlayer1.setText(pseudo1+" : "+game.getPlayer1().getScore());
+							scorePlayer2.setText(pseudo2+" : "+game.getPlayer2().getScore());
 							
 						}
 						
@@ -290,11 +293,11 @@ public class GamePane extends HBox {
 						System.out.println(game.isFinished());
 						
 						if(game.isFinished()) {
-							quiAGagne.setText("Le joueur 2 a gagné");
+							quiAGagne.setText(pseudo2+" a gagné");
 							quiAGagne.setFont(Font.font("Verdana", 30));
 							game.getPlayer2().incrementScore(1);
-							scorePlayer1.setText("Score joueur 1 : "+game.getPlayer1().getScore());
-							scorePlayer2.setText("Score joueur 2 : "+game.getPlayer2().getScore());
+							scorePlayer1.setText(pseudo1+" : "+game.getPlayer1().getScore());
+							scorePlayer2.setText(pseudo2+" : "+game.getPlayer2().getScore());
 							game=new Game(game.getPlayer1(),game.getPlayer2());
 							cases=new Vector<Case>();
 							gridSetup();
