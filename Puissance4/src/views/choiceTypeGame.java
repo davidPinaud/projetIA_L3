@@ -87,6 +87,5 @@ public class choiceTypeGame extends BorderPane {
 		flow.setAlignment(Pos.CENTER);
 		this.setCenter(flow);
 		BorderPane.setAlignment(flow, Pos.CENTER);
-
 	}
 }
