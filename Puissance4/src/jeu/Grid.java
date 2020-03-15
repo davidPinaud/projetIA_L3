@@ -79,5 +79,18 @@ public class Grid {
 		}
 		return stb.toString();
 	}
+	
+	public void copyGrid(Grid gridColler) {
+		for(int ligne=0;ligne<=this.getNB_LIGNE();ligne++) {
+			for(int colonne=0;colonne<=this.getNB_COLONNE();colonne++) {
+				try {
+					gridColler.setCase(ligne, colonne, this.getCase(ligne, colonne));
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+	}
 
 }
