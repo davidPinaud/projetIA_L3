@@ -57,7 +57,7 @@ public class choiceTypeGame extends BorderPane {
 
 		// code humain contre minmax
 		this.boutonHumainContreMinMax.setOnAction((event) -> {
-			// TODO
+			stage.setScene(new Scene(new NameViewMiniMax(stage)));
 		});
 		this.boutonHumainContreMinMax.setFont(Font.font("Verdana", 20));
 		this.boutonHumainContreMinMax.setMinWidth(150);

@@ -22,378 +22,296 @@ import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import jeu.Case;
+import jeu.Etat;
 import jeu.Game;
+import jeu.Grid;
+import jeu.Minimax;
 import views.GamePane.handler;
 
-public class GamePaneMinMax extends HBox{
+public class GamePaneMinMax extends HBox {
 	// attributs
-		private GridPane grid = new GridPane();
-		private FlowPane flow = new FlowPane(Orientation.VERTICAL);
-		private Game game = new Game();
-		private Button boutonQuitter = new Button("Quitter");
-		private Button relancerPartie= new Button("Relancer la partie");
-		private Vector<Case> cases = new Vector<Case>();
-		private Label scorePlayer1=new Label("");
-		private Label scorePlayer2=new Label("");
-		private Label quiAGagne=new Label("");
+	private GridPane grid = new GridPane();
+	private FlowPane flow = new FlowPane(Orientation.VERTICAL);
+	private Game game = new Game();
+	private Button boutonQuitter = new Button("Quitter");
+	private Button relancerPartie = new Button("Relancer la partie");
+	private Vector<Case> cases = new Vector<Case>();
+	private Label scorePlayer1 = new Label("");
+	private Label scorePlayer2 = new Label("");
+	private Label quiAGagne = new Label("");
+	private String pseudo1, pseudo2;
 
-		private static final int TAILLEFENETRELARGEUR = 1375;
-		private static final int TAILLEFENETRELONGUEUR = 925;
+	private static final int TAILLEFENETRELARGEUR = 1375;
+	private static final int TAILLEFENETRELONGUEUR = 925;
 
-		public GamePaneMinMax(Stage stage) {
-			stage.setHeight(TAILLEFENETRELONGUEUR);
-			stage.setWidth(TAILLEFENETRELARGEUR);
-			// Background image
-			BackgroundSize bSize = new BackgroundSize(100, 100, true, true, true, true);// double width, double height,
-																						// boolean widthAsPercentage,
-																						// boolean heightAsPercentage,
-																						// boolean contain, boolean cover
-			Background backgroundMenu = new Background(new BackgroundImage(new Image("res/backgroundMenu.jpg"),
-					BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, bSize));
-			this.setBackground(backgroundMenu);
+	public GamePaneMinMax(Stage stage, String pseudo1, String pseudo2) {
+		this.pseudo1 = pseudo1;
+		this.pseudo2 = pseudo2;
+		stage.setHeight(TAILLEFENETRELONGUEUR);
+		stage.setWidth(TAILLEFENETRELARGEUR);
+		// Background image
+		BackgroundSize bSize = new BackgroundSize(100, 100, true, true, true, true);// double width, double height,
+																					// boolean widthAsPercentage,
+																					// boolean heightAsPercentage,
+																					// boolean contain, boolean cover
+		Background backgroundMenu = new Background(new BackgroundImage(new Image("res/backgroundMenu.jpg"),
+				BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, bSize));
+		this.setBackground(backgroundMenu);
 
-			// permet d'initialiser la grille de depart (vide)
+		// permet d'initialiser la grille de depart (vide)
+		gridSetup();
+
+		// code for label
+		scorePlayer1.setText(pseudo1 + " : " + game.getPlayer1().getScore());
+		scorePlayer2.setText(pseudo2 + " : " + game.getPlayer2().getScore());
+		scorePlayer1.setFont(Font.font("Verdana", 30));
+		scorePlayer2.setFont(Font.font("Verdana", 30));
+		flow.getChildren().add(this.scorePlayer1);
+		flow.getChildren().add(this.scorePlayer2);
+		flow.getChildren().add(this.quiAGagne);
+		FlowPane.setMargin(quiAGagne, new Insets(100, 0, 0, 0));
+		FlowPane.setMargin(this.scorePlayer1, new Insets(10, 0, 0, 0));
+		FlowPane.setMargin(this.scorePlayer2, new Insets(30, 0, 0, 0));
+
+		// code for relancerPartie
+		relancerPartie.setOnAction((event) -> {
+			game = new Game(game.getPlayer1(), game.getPlayer2());
+			cases = new Vector<Case>();
 			gridSetup();
-
-			
-			
-			
-			
-			//code for label
-			scorePlayer1.setText("Score joueur 1 : "+game.getPlayer1().getScore());
-			scorePlayer2.setText("Score joueur 2 : "+game.getPlayer2().getScore());
-			scorePlayer1.setFont(Font.font("Verdana", 30));
-			scorePlayer2.setFont(Font.font("Verdana", 30));
-			flow.getChildren().add(this.scorePlayer1);
-			flow.getChildren().add(this.scorePlayer2);
-			flow.getChildren().add(this.quiAGagne);
-			FlowPane.setMargin(quiAGagne, new Insets(100,0,0,0));
-			FlowPane.setMargin(this.scorePlayer1, new Insets(10,0,0,0));
-			FlowPane.setMargin(this.scorePlayer2, new Insets(30,0,0,0));
-			
-			// code for relancerPartie
-					relancerPartie.setOnAction((event) -> {
-						game=new Game(game.getPlayer1(),game.getPlayer2());
-						cases=new Vector<Case>();
-						gridSetup();
-						for (Case i : cases) {
-							grid.getChildren().add(i.getImageView());
-						}
-						
-					});
-					relancerPartie.setFont(Font.font("Verdana", 20));
-					relancerPartie.setMinWidth(150);
-					flow.getChildren().add(relancerPartie);
-					FlowPane.setMargin(this.relancerPartie, new Insets(550,0,0,0));
-					
-					// code for BoutonQuitter
-					boutonQuitter.setOnAction((event) -> {
-						Platform.exit();
-					});
-					boutonQuitter.setFont(Font.font("Verdana", 20));
-					boutonQuitter.setMinWidth(150);
-					flow.getChildren().add(boutonQuitter);
-					FlowPane.setMargin(this.boutonQuitter, new Insets(10,0,0,0));
-
-			// code for grid
-			grid.setGridLinesVisible(true);
 			for (Case i : cases) {
 				grid.getChildren().add(i.getImageView());
 			}
 
-			// setting grid to the left and flow to the right
-			this.getChildren().addAll(grid, flow);
+		});
+		relancerPartie.setFont(Font.font("Verdana", 20));
+		relancerPartie.setMinWidth(150);
+		flow.getChildren().add(relancerPartie);
+		FlowPane.setMargin(this.relancerPartie, new Insets(550, 0, 0, 0));
 
+		// code for BoutonQuitter
+		boutonQuitter.setOnAction((event) -> {
+			Platform.exit();
+		});
+		boutonQuitter.setFont(Font.font("Verdana", 20));
+		boutonQuitter.setMinWidth(150);
+		flow.getChildren().add(boutonQuitter);
+		FlowPane.setMargin(this.boutonQuitter, new Insets(10, 0, 0, 0));
+
+		// code for grid
+		grid.setGridLinesVisible(true);
+		for (Case i : cases) {
+			grid.getChildren().add(i.getImageView());
 		}
 
-		public void gridSetup() {
-			// case 0,0
-			int m = 0;
+		// setting grid to the left and flow to the right
+		this.getChildren().addAll(grid, flow);
 
-			for (int l = 0; l < 6; l++) {
-				for (int c = 0; c < 7; c++) {
+	}
 
-					cases.add(new Case(new ImageView("res/blankImage.png"), l, c));
+	public void gridSetup() {
+		// case 0,0
+		int m = 0;
 
-					cases.get(m).getImageView().setFitHeight(150);
-					cases.get(m).getImageView().setFitWidth(150);
-					cases.get(m).getImageView().setOnMouseClicked(new handler(m));
-					GridPane.setConstraints(cases.get(m).getImageView(), c, l);
-					m++;
-				}
+		for (int l = 0; l < 6; l++) {
+			for (int c = 0; c < 7; c++) {
+
+				cases.add(new Case(new ImageView("res/blankImage.png"), l, c));
+
+				cases.get(m).getImageView().setFitHeight(150);
+				cases.get(m).getImageView().setFitWidth(150);
+				cases.get(m).getImageView().setOnMouseClicked(new handler(m));
+				GridPane.setConstraints(cases.get(m).getImageView(), c, l);
+				m++;
 			}
-
-		}
-
-		class handler implements EventHandler<MouseEvent> {
-			int m;
-
-			public handler(int m) {
-				this.m = m;
-			}
-
-			@Override
-			public void handle(MouseEvent arg0) {
-
-				Case caseClicked = cases.get(m);
-				int ligne;
-				int colonne = caseClicked.getY();
-//				System.out.println(0);
-				if (game.getIsPlayer1Turn()) { // si c'est le tour du joueur 1
-
-//					System.out.println(1);
-
-					if (game.getPlayer1().getToken().contentEquals("blue")) { // si son token est blue
-//						System.out.println(2);
-						if (this.isThereMoreSpaceInColumn(colonne)) { // s'il y a de l'espace dans la colonne
-//							System.out.println(3);
-							// System.out.println(this.whichLinetoPutToken(colonne)+" "+colonne);
-							ligne=this.whichLinetoPutToken(colonne);
-							this.caseFromVectorWithCoordinates(ligne, colonne).getImageView()
-									.setImage(new Image("res/blueo.png"));
-							this.caseFromVectorWithCoordinates(ligne, colonne).setEmpty(false);
-							// System.out.println(cases);
-							game.setIsPlayer1Turn(false);
-							
-							try {
-								game.getGrid().setCase(ligne, colonne, "blue");
-							} catch (Exception e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-							System.out.println(game.isFinished());
-//							System.out.println(game.getGrid().getCase(5, 6));
-//							System.out.println(game.getGrid().getCase(4, 6));
-//							System.out.println(game.getGrid().getCase(3, 6));
-//							System.out.println(game.getGrid().getCase(2, 6));
-//							System.out.println(game.getGrid().getCase(1, 6));
-//							System.out.println(game.getGrid().getCase(0, 6));
-							if(game.isFinished()) {
-								quiAGagne.setText("Le joueur 1 a gagné");
-								quiAGagne.setFont(Font.font("Verdana", 30));
-								game.getPlayer1().incrementScore(1);
-								scorePlayer1.setText("Score joueur 1 : "+game.getPlayer1().getScore());
-								scorePlayer2.setText("Score joueur 2 : "+game.getPlayer2().getScore());
-								game=new Game(game.getPlayer1(),game.getPlayer2());
-								cases=new Vector<Case>();
-								gridSetup();
-								for (Case i : cases) {
-									grid.getChildren().add(i.getImageView());
-								}
-								
-								
-								
-							}
-							
-
-						}
-					}
-
-					else {
-//						System.out.println(3.5);
-
-						if (this.isThereMoreSpaceInColumn(colonne)) {
-							ligne=this.whichLinetoPutToken(colonne);
-//							System.out.println(4);
-							this.caseFromVectorWithCoordinates(ligne, colonne).getImageView()
-									.setImage(new Image("res/redx.png"));
-							this.caseFromVectorWithCoordinates(ligne, colonne).setEmpty(false);
-							game.setIsPlayer1Turn(false);
-							
-							try {
-//								System.out.println("hello3");
-								game.getGrid().setCase(ligne, colonne, "red");
-							} catch (Exception e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-							System.out.println(game.isFinished());
-							if(game.isFinished()) {
-								quiAGagne.setText("Le joueur 1 a gagné");
-								quiAGagne.setFont(Font.font("Verdana", 30));
-								game.getPlayer1().incrementScore(1);
-								game=new Game(game.getPlayer1(),game.getPlayer2());
-								cases=new Vector<Case>();
-								gridSetup();
-								for (Case i : cases) {
-									grid.getChildren().add(i.getImageView());
-								}
-								
-								scorePlayer1.setText("Score joueur 1 : "+game.getPlayer1().getScore());
-								scorePlayer2.setText("Score joueur 2 : "+game.getPlayer2().getScore());
-								
-							}
-							
-
-							
-						}
-
-					}
-
-				}
-
-				else {//else joueur 2
-//					System.out.println(5);
-					if (game.getPlayer2().getToken().contentEquals("blue")) {
-//						System.out.println(6);
-						if (this.isThereMoreSpaceInColumn(colonne)) {
-							ligne=this.whichLinetoPutToken(colonne);
-							System.out.println(7);
-							this.caseFromVectorWithCoordinates(ligne, colonne).getImageView()
-									.setImage(new Image("res/blueo.png"));
-							this.caseFromVectorWithCoordinates(ligne, colonne).setEmpty(false);
-							game.setIsPlayer1Turn(true);
-							
-							try {
-								game.getGrid().setCase(ligne, colonne, "blue");
-							} catch (Exception e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-							System.out.println(game.isFinished());
-							if(game.isFinished()) {
-								quiAGagne.setText("Le joueur 2 a gagné");
-								quiAGagne.setFont(Font.font("Verdana", 30));
-								game.getPlayer2().incrementScore(1);
-								game=new Game(game.getPlayer1(),game.getPlayer2());
-								cases=new Vector<Case>();
-								gridSetup();
-								for (Case i : cases) {
-									grid.getChildren().add(i.getImageView());
-								}
-								
-								scorePlayer1.setText("Score joueur 1 : "+game.getPlayer1().getScore());
-								scorePlayer2.setText("Score joueur 2 : "+game.getPlayer2().getScore());
-								
-							}
-							
-
-						}
-					}
-
-					else {
-//						System.out.println(8);
-						if (this.isThereMoreSpaceInColumn(colonne)) {
-							ligne=this.whichLinetoPutToken(colonne);
-//							System.out.println(9);
-							this.caseFromVectorWithCoordinates(ligne, colonne).getImageView()
-									.setImage(new Image("res/redx.png"));
-							this.caseFromVectorWithCoordinates(ligne, colonne).setEmpty(false);
-							game.setIsPlayer1Turn(true);
-							
-							try {
-								game.getGrid().setCase(ligne, colonne, "red");
-							} catch (Exception e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-							System.out.println(game.isFinished());
-							
-							if(game.isFinished()) {
-								quiAGagne.setText("Le joueur 2 a gagné");
-								quiAGagne.setFont(Font.font("Verdana", 30));
-								game.getPlayer2().incrementScore(1);
-								scorePlayer1.setText("Score joueur 1 : "+game.getPlayer1().getScore());
-								scorePlayer2.setText("Score joueur 2 : "+game.getPlayer2().getScore());
-								game=new Game(game.getPlayer1(),game.getPlayer2());
-								cases=new Vector<Case>();
-								gridSetup();
-								for (Case i : cases) {
-									grid.getChildren().add(i.getImageView());
-								}
-								
-								
-								
-							}
-							
-							
-//							System.out.println(game.getGrid().getCase(5, 6));
-//							System.out.println(game.getGrid().getCase(4, 6));
-//							System.out.println(game.getGrid().getCase(3, 6));
-//							System.out.println(game.getGrid().getCase(2, 6));
-//							System.out.println(game.getGrid().getCase(1, 6));
-//							System.out.println(game.getGrid().getCase(0, 6));
-
-
-						}
-					}
-
-				}
-
-			}
-
-			public boolean isThereMoreSpaceInColumn(int colonne) {
-				int howManyTokens = 0;
-				for (Case c : cases) {
-					if (c.getY() == colonne) {
-						if (!c.isEmpty()) {
-							howManyTokens++;
-						}
-					}
-				}
-
-				return howManyTokens<6;
-			}
-
-			public int whichLinetoPutToken(int colonne) {
-				Vector<Case> cases2 = new Vector<>();
-				for (Case c : cases) {
-					if (c.getY() == colonne) {
-						cases2.add(c);
-					}
-				}
-
-				sortFromLine(cases2);
-				// System.out.println(cases2);
-				for (int i = cases2.size() - 1; i >= 0; i--) {
-					// System.out.println(cases2.get(i));
-					if (cases2.get(i).isEmpty()) {
-
-						return i;
-					}
-				}
-				System.out.println("no line found");
-				return -1;
-			}
-
-			public void sortFromLine(Vector<Case> cases2) {
-				Case minCase, temp;
-				int indexOfSmallest;
-				for (int i = 0; i < cases2.size() - 1; i++) {
-					indexOfSmallest = indexOfMinList(i + 1, cases2);
-					minCase = cases2.get(indexOfSmallest);
-					if (minCase.getX() < cases2.get(i).getX()) {
-						temp = cases2.get(i);
-						cases2.set(i, minCase);
-						cases2.set(indexOfSmallest, temp);
-					}
-				}
-			}
-
-			public int indexOfMinList(int i, Vector<Case> cases2) {
-				Case min = cases2.get(i);
-				int indexMin = i;
-				int k = i;
-				for (k = i; k < cases2.size(); k++) {
-					if (min.getX() > cases2.get(k).getX()) {
-						min = cases2.get(k);
-						indexMin = k;
-					}
-				}
-				return indexMin;
-			}
-
-			public Case caseFromVectorWithCoordinates(int x, int y) {
-				for (Case c : cases) {
-					if ((c.getX() == x) && (c.getY() == y)) {
-						return c;
-					}
-				}
-				System.out.println("rien trouvé");
-				return null;
-			}
-
 		}
 
 	}
 
+	class handler implements EventHandler<MouseEvent> {
+		int m;
+
+		public handler(int m) {
+			this.m = m;
+		}
+
+		@Override
+		public void handle(MouseEvent arg0) {
+
+			Case caseClicked = cases.get(m);
+			int ligne;
+			int colonne = caseClicked.getY();
+//				System.out.println(0);
+			if (game.getIsPlayer1Turn()) { // si c'est le tour du joueur 1
+
+//					System.out.println(1);
+
+				if (game.getPlayer1().getToken().contentEquals("blue")) { // si son token est blue
+//						System.out.println(2);
+					if (this.isThereMoreSpaceInColumn(colonne)) { // s'il y a de l'espace dans la colonne
+//							System.out.println(3);
+						// System.out.println(this.whichLinetoPutToken(colonne)+" "+colonne);
+						ligne = this.whichLinetoPutToken(colonne);
+						this.caseFromVectorWithCoordinates(ligne, colonne).getImageView()
+								.setImage(new Image("res/blueo.png"));
+						this.caseFromVectorWithCoordinates(ligne, colonne).setEmpty(false);
+						// System.out.println(cases);
+						game.setIsPlayer1Turn(false);
+
+						try {
+							game.getGrid().setCase(ligne, colonne, "blue");
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						// System.out.println(game.isFinished());
+//							System.out.println(game.getGrid().getCase(5, 6));
+//							System.out.println(game.getGrid().getCase(4, 6));
+//							System.out.println(game.getGrid().getCase(3, 6));
+//							System.out.println(game.getGrid().getCase(2, 6));
+//							System.out.println(game.getGrid().getCase(1, 6));
+//							System.out.println(game.getGrid().getCase(0, 6));
+						if (game.isFinished()) {
+							quiAGagne.setText(pseudo1 + " a gagné");
+							quiAGagne.setFont(Font.font("Verdana", 30));
+							game.getPlayer1().incrementScore(1);
+							scorePlayer1.setText(pseudo1 + " : " + game.getPlayer1().getScore());
+							scorePlayer2.setText(pseudo2 + " : " + game.getPlayer2().getScore());
+							game = new Game(game.getPlayer1(), game.getPlayer2());
+							cases = new Vector<Case>();
+							gridSetup();
+							for (Case i : cases) {
+								grid.getChildren().add(i.getImageView());
+							}
+
+						}
+						
+						//L'IA joue
+						Minimax minimax=new Minimax(GamePaneMinMax.this.game,5); //calcul des états possible puis les utilités de ces états
+						Etat etatParent=minimax.getEtatParent();
+						System.out.println("etat Parent "+etatParent);
+						Etat etatChoisi = etatParent.getEnfants().get(0);
+						
+						for(Etat etatEnfant:etatParent.getEnfants()) {
+							System.out.println(etatEnfant.getUtilite()+"\netat associé:\n"+etatEnfant);
+							etatChoisi=etatChoisi.getUtilite()<=etatEnfant.getUtilite()?etatChoisi:etatEnfant; // on prends l'état avec la plus grande utilité
+						}
+						//on regarde les différences entre les grilles du jeu et celui de l'état suivant
+						System.out.println("etat choisi "+etatChoisi+"\n------------------");
+						int ligneIA = 0,colonneIA = 0;
+						Grid gridEnfant=etatChoisi.getGrid();
+						for(int lig=0;lig<=gridEnfant.getNB_LIGNE();lig++) {
+							for(int col=0;col<=gridEnfant.getNB_COLONNE();col++){
+								if(!gridEnfant.getCase(lig, col).contentEquals(game.getGrid().getCase(lig, col))){
+									ligneIA=lig;
+									colonneIA=col;
+									break;
+								}
+							}
+						}
+						//On met le choix de l'ia dans l'interface et dans le game
+						this.caseFromVectorWithCoordinates(ligneIA, colonneIA).getImageView()
+						.setImage(new Image("res/redx.png"));
+						this.caseFromVectorWithCoordinates(ligneIA, colonneIA).setEmpty(false);
+						try {
+							game.getGrid().setCase(ligneIA, colonneIA, "red");
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						if (game.isFinished()) {
+							quiAGagne.setText(pseudo2 + " a gagné");
+							quiAGagne.setFont(Font.font("Verdana", 30));
+							game.getPlayer2().incrementScore(1);
+							scorePlayer1.setText(pseudo1 + " : " + game.getPlayer1().getScore());
+							scorePlayer2.setText(pseudo2 + " : " + game.getPlayer2().getScore());
+							game = new Game(game.getPlayer1(), game.getPlayer2());
+							cases = new Vector<Case>();
+							gridSetup();
+							for (Case i : cases) {
+								grid.getChildren().add(i.getImageView());
+							}
+
+						}
+						game.setIsPlayer1Turn(true);
+
+					}
+				}
+
+			}
+
+		}
+
+		public boolean isThereMoreSpaceInColumn(int colonne) {
+			int howManyTokens = 0;
+			for (Case c : cases) {
+				if (c.getY() == colonne) {
+					if (!c.isEmpty()) {
+						howManyTokens++;
+					}
+				}
+			}
+
+			return howManyTokens < 6;
+		}
+
+		public int whichLinetoPutToken(int colonne) {
+			Vector<Case> cases2 = new Vector<>();
+			for (Case c : cases) {
+				if (c.getY() == colonne) {
+					cases2.add(c);
+				}
+			}
+
+			sortFromLine(cases2);
+			// System.out.println(cases2);
+			for (int i = cases2.size() - 1; i >= 0; i--) {
+				// System.out.println(cases2.get(i));
+				if (cases2.get(i).isEmpty()) {
+
+					return i;
+				}
+			}
+			System.out.println("no line found");
+			return -1;
+		}
+
+		public void sortFromLine(Vector<Case> cases2) {
+			Case minCase, temp;
+			int indexOfSmallest;
+			for (int i = 0; i < cases2.size() - 1; i++) {
+				indexOfSmallest = indexOfMinList(i + 1, cases2);
+				minCase = cases2.get(indexOfSmallest);
+				if (minCase.getX() < cases2.get(i).getX()) {
+					temp = cases2.get(i);
+					cases2.set(i, minCase);
+					cases2.set(indexOfSmallest, temp);
+				}
+			}
+		}
+
+		public int indexOfMinList(int i, Vector<Case> cases2) {
+			Case min = cases2.get(i);
+			int indexMin = i;
+			int k = i;
+			for (k = i; k < cases2.size(); k++) {
+				if (min.getX() > cases2.get(k).getX()) {
+					min = cases2.get(k);
+					indexMin = k;
+				}
+			}
+			return indexMin;
+		}
+
+		public Case caseFromVectorWithCoordinates(int x, int y) {
+			for (Case c : cases) {
+				if ((c.getX() == x) && (c.getY() == y)) {
+					return c;
+				}
+			}
+			System.out.println("rien trouvé");
+			return null;
+		}
+
+	}
+
+}

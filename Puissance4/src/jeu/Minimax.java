@@ -15,6 +15,7 @@ public class Minimax {
 		this.profondeur = profondeur;
 		this.initialiserEtatEnfants(etatParent, this.profondeur, true); // initialisation des enfants d'etatParent
 		this.minimax(this.etatParent, this.profondeur, true);
+		System.out.println(etatParent.getEnfants()+"===========================");
 	}
 
 	/**
@@ -33,33 +34,34 @@ public class Minimax {
 				colonneJouable.add(i);
 			}
 		}
-
 		List<List<Integer>> listeDePositionJouable = new Vector<>(); // liste des coordonnées de position jouable dans
 																		// la grille donné
 		// cette liste est une liste de liste tel que :
 		// [[ligne,colonne],[ligne,colonne],[ligne,colonne]]
 		// cette liste va determiner le nombre d'enfants de l'etat
 
-		for (Integer i : colonneJouable) {
+		for (int c=0;c<colonneJouable.size();c++) {
 			listeDePositionJouable.add(new Vector<Integer>());
 			for (int k = 0; k <= grid.getNB_LIGNE(); k++) {
-				if (grid.getCase(k, i) != "") {// on trouve la premiere ligne ou il y a un jeton
-					listeDePositionJouable.get(i).add(k - 1); // on ajoute le jeton sur la ligne d'avant
-					listeDePositionJouable.get(i).add(i); // ajout de la colonne associé dans la meme liste
+				if (grid.getCase(k, colonneJouable.get(c)) != "") {// on trouve la premiere ligne ou il y a un jeton
+					listeDePositionJouable.get(c).add(k - 1); // on ajoute le jeton sur la ligne d'avant
+					listeDePositionJouable.get(c).add(colonneJouable.get(c)); // ajout de la colonne associé dans la meme liste
 					break;
 				} else if (k == grid.getNB_LIGNE()) {// si il y a rien dans la colonne
-					listeDePositionJouable.get(i).add(k);// on ajoute le jeton à la derniere colonne
-					listeDePositionJouable.get(i).add(i);// ajout de la colonne associé dans la meme liste
+					listeDePositionJouable.get(c).add(k);// on ajoute le jeton à la derniere colonne
+					listeDePositionJouable.get(c).add(colonneJouable.get(c));// ajout de la colonne associé dans la meme liste
 				}
 			}
+
 		}
+		//System.out.println("profondeur : "+profondeur+"\nlisteDePositionJouable : "+listeDePositionJouable);
+
 		Grid gridBuffer;
 		for (List<Integer> position : listeDePositionJouable) {
 			gridBuffer = new Grid();
 			grid.copyGrid(gridBuffer);// on copie grid dans GridBuffer
 			try {
-				gridBuffer.setCase(position.get(0), position.get(1), isMax ? "blue" : "red"); // Max (player) is blue,
-																								// Min is red
+				gridBuffer.setCase(position.get(0), position.get(1), isMax ? "red" : "blue"); 
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -113,7 +115,15 @@ public class Minimax {
 		if (this.isFinished(etat.getGrid())) {
 			return isMax ? 2147483647 : -2147483648;
 		}
-		int valeurUtilite = 0;
+		int valeurUtilite = this.checkAntiSlashPourValeurUtilite(etat.getGrid(), isMax)
+				+this.checkHoriPourValeurUtilite(etat.getGrid(), isMax)
+				+this.checkVertPourValeurUtilite(etat.getGrid(), isMax)
+				+this.checkSlashPourValeurUtilite(etat.getGrid(), isMax);
+		etat.setAntislash(this.checkAntiSlashPourValeurUtilite(etat.getGrid(), isMax));
+		etat.setSlash(this.checkSlashPourValeurUtilite(etat.getGrid(), isMax));
+		etat.setHorizontale(this.checkHoriPourValeurUtilite(etat.getGrid(), isMax));
+		etat.setVertical(this.checkVertPourValeurUtilite(etat.getGrid(), isMax));
+		etat.setUtilite(valeurUtilite);
 		return valeurUtilite;
 	}
 
@@ -152,19 +162,19 @@ public class Minimax {
 						countTokenRed = 0;
 					}
 					if(countTokenRed==3&&!isMax) {
-						valeur+=100;
+						valeur+=-100;
 					}
 					else if(countTokenRed==2&&!isMax) {
-						valeur+=10;
+						valeur+=-10;
 					}
 					if(countTokenRed==3&&isMax) {
-						valeur+=500;
+						valeur+=-500;
 					}
 					else if(countTokenRed==2&&isMax){
-						valeur+=50;
+						valeur+=-50;
 					}
 					else if(countTokenRed==1&&isMax) {
-						valeur+=5;
+						valeur+=-5;
 					}
 					break;
 				}
@@ -228,13 +238,53 @@ public class Minimax {
 			for(int ligne=0;ligne<=grid.getNB_LIGNE();ligne++) {
 				switch(grid.getCase(ligne, colonne)) {
 				case "blue":{
+					countTokenBlue++;
+					if(countTokenRed>0) {
+						countTokenBlue=0;
+					}
+					if(countTokenBlue==3&&isMax) {
+						valeur+=100;
+					}
+					else if(countTokenBlue==2&&isMax) {
+						valeur+=10;
+					}
+					if(countTokenBlue==3&&!isMax) {
+						valeur+=500;
+					}
+					else if(countTokenBlue==2&&!isMax){
+						valeur+=50;
+					}
+					else if(countTokenBlue==1&&!isMax) {
+						valeur+=5;
+					}
 					break;
 				}
 				case "red" :{
+					countTokenRed++;
+					if (countTokenBlue > 0) {
+						countTokenRed = 0;
+					}
+					if(countTokenRed==3&&!isMax) {
+						valeur+=-100;
+					}
+					else if(countTokenRed==2&&!isMax) {
+						valeur+=-10;
+					}
+					if(countTokenRed==3&&isMax) {
+						valeur+=-500;
+					}
+					else if(countTokenRed==2&&isMax){
+						valeur+=-50;
+					}
+					else if(countTokenRed==1&&isMax) {
+						valeur+=-5;
+					}
 					break;
 				}
 				default:{
-					
+					countTokenBlue=0;
+					countTokenRed=0;
+					break;
 				}
 				}
 			}
@@ -334,7 +384,181 @@ public class Minimax {
 		}
 		return false;
 	}
-
+	public int checkSlashPourValeurUtilite(Grid grid,boolean isMax) {
+		int valeur = 0;
+		int countTokenBlue = 0;
+		int countTokenRed = 0;
+		int ligne2,colonne2;
+		for (int ligne = 3; ligne <= grid.getNB_LIGNE(); ligne++) {
+			for (int colonne = 0; colonne <= 3; colonne++) {
+				switch(grid.getCase(ligne, colonne)) {
+				case "blue":{
+					countTokenBlue=1;
+					if(countTokenRed>0) {
+						countTokenRed=0;
+					}
+					ligne2=ligne;
+					colonne2=colonne;
+					for(int k=1;k<4;k++) {
+						ligne2--;
+						colonne2++;
+						if(grid.getCase(ligne2, colonne2)=="blue") {
+							countTokenBlue++;
+							if(countTokenBlue==3&&isMax) {
+								valeur+=100;
+							}
+							else if(countTokenBlue==2&&isMax) {
+								valeur+=10;
+							}
+							if(countTokenBlue==3&&!isMax) {
+								valeur+=500;
+							}
+							else if(countTokenBlue==2&&!isMax){
+								valeur+=50;
+							}
+							else if(countTokenBlue==1&&!isMax) {
+								valeur+=5;
+							}
+						}else if(grid.getCase(ligne2, colonne2)=="red") {
+							countTokenBlue=0;
+						}
+					}
+					break;
+				}
+				case "red":{
+					countTokenRed=1;
+					if(countTokenBlue>0) {
+						countTokenBlue=0;
+					}
+					ligne2=ligne;
+					colonne2=colonne;
+					for(int k=1;k<4;k++) {
+						ligne2--;
+						colonne2++;
+						if(grid.getCase(ligne2, colonne2)=="blue") {
+							countTokenRed++;
+							if(countTokenRed==3&&!isMax) {
+								valeur+=-100;
+							}
+							else if(countTokenRed==2&&!isMax) {
+								valeur+=-10;
+							}
+							if(countTokenRed==3&&isMax) {
+								valeur+=-500;
+							}
+							else if(countTokenRed==2&&isMax){
+								valeur+=-50;
+							}
+							else if(countTokenRed==1&&isMax) {
+								valeur+=-5;
+							}
+						}else if(grid.getCase(ligne2, colonne2)=="red") {
+							countTokenBlue=0;
+						}
+					}
+					break;
+				}
+				default:{
+					countTokenBlue=0;
+					countTokenRed=0;
+				}
+				}
+				
+			}
+			countTokenBlue = 0;
+			countTokenRed = 0;
+		}
+		return valeur;
+	}
+	
+	public int checkAntiSlashPourValeurUtilite(Grid grid,boolean isMax) {
+		int valeur = 0;
+		int countTokenBlue = 0;
+		int countTokenRed = 0;
+		int ligne2,colonne2;
+		for (int ligne = 3; ligne <= grid.getNB_LIGNE(); ligne++) {
+			for (int colonne = 3; colonne <= grid.getNB_COLONNE(); colonne++) {
+				switch(grid.getCase(ligne, colonne)) {
+				case "blue":{
+					countTokenBlue=1;
+					if(countTokenRed>0) {
+						countTokenRed=0;
+					}
+					ligne2=ligne;
+					colonne2=colonne;
+					for(int k=1;k<4;k++) {
+						ligne2--;
+						colonne2--;
+						if(grid.getCase(ligne2, colonne2)=="blue") {
+							countTokenBlue++;
+							if(countTokenBlue==3&&isMax) {
+								valeur+=100;
+							}
+							else if(countTokenBlue==2&&isMax) {
+								valeur+=10;
+							}
+							if(countTokenBlue==3&&!isMax) {
+								valeur+=500;
+							}
+							else if(countTokenBlue==2&&!isMax){
+								valeur+=50;
+							}
+							else if(countTokenBlue==1&&!isMax) {
+								valeur+=5;
+							}
+						}else if(grid.getCase(ligne2, colonne2)=="red") {
+							countTokenBlue=0;
+						}
+					}
+					break;
+				}
+				case "red":{
+					countTokenRed=1;
+					if(countTokenBlue>0) {
+						countTokenBlue=0;
+					}
+					ligne2=ligne;
+					colonne2=colonne;
+					for(int k=1;k<4;k++) {
+						ligne2--;
+						colonne2--;
+						if(grid.getCase(ligne2, colonne2)=="blue") {
+							countTokenRed++;
+							if(countTokenRed==3&&!isMax) {
+								valeur+=-100;
+							}
+							else if(countTokenRed==2&&!isMax) {
+								valeur+=-10;
+							}
+							if(countTokenRed==3&&isMax) {
+								valeur+=-500;
+							}
+							else if(countTokenRed==2&&isMax){
+								valeur+=-50;
+							}
+							else if(countTokenRed==1&&isMax) {
+								valeur+=-5;
+							}
+						}else if(grid.getCase(ligne2, colonne2)=="red") {
+							countTokenBlue=0;
+						}
+					}
+					break;
+				}
+				default:{
+					countTokenBlue=0;
+					countTokenRed=0;
+				}
+				}
+				
+			}
+			countTokenBlue = 0;
+			countTokenRed = 0;
+		}
+		return valeur;
+	}
+	
+	
 	public boolean checkAntiSlash(Grid grid) {
 		int countToken1 = 0;
 		int countToken2 = 0;
@@ -393,5 +617,9 @@ public class Minimax {
 			countToken2 = 0;
 		}
 		return false;
+	}
+	
+	public Etat getEtatParent() {
+		return this.etatParent;
 	}
 }

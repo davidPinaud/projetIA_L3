@@ -39,18 +39,6 @@ public class Game {
 		return false;
 	}
 	
-	public void play(Player player,int ligne,int colonne) {
-		if(player.equalsPlayer(player1)){
-			this.isplayer1Turn=false;
-			try {
-				grid.setCase(ligne, colonne, player1.getToken());
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		
-	}
 	
 	
 	

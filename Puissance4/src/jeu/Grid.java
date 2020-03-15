@@ -55,7 +55,7 @@ public class Grid {
 	 */
 
 	public boolean equalsToken(String token) {
-		if ((token == "red") || (token == "blue")) {
+		if ((token == "red") || (token == "blue")||(token=="")) {
 			return true;
 		} else {
 			return false;
@@ -67,13 +67,10 @@ public class Grid {
 	 */
 
 	public String toString() {
-		StringBuffer stb = new StringBuffer();
-
-		for (int l = 0; l < this.NB_LIGNE; l++) {
-			stb.append("|");
-			for (int c = 0; c < this.NB_COLONNE; c++) {
-
-				stb.append(this.getCase(l, c) + "|");
+		StringBuilder stb=new StringBuilder();
+		for(String [] ligne:this.getGrille()) {
+			for(String colonne:ligne) {
+				stb.append((colonne==""?"*":(colonne=="blue"?"b":"r"))+" ");
 			}
 			stb.append("\n");
 		}
