@@ -14,6 +14,7 @@ public class Minimax {
 		etatParent = new Etat(game, game.getGrid());
 		this.profondeur = profondeur;
 		this.initialiserEtatEnfants(etatParent, this.profondeur, true); // initialisation des enfants d'etatParent
+		this.minimax(this.etatParent, this.profondeur, true);
 	}
 
 	/**
@@ -57,7 +58,8 @@ public class Minimax {
 			gridBuffer = new Grid();
 			grid.copyGrid(gridBuffer);// on copie grid dans GridBuffer
 			try {
-				gridBuffer.setCase(position.get(0), position.get(1), isMax ? "blue" : "red");
+				gridBuffer.setCase(position.get(0), position.get(1), isMax ? "blue" : "red"); // Max (player) is blue,
+																								// Min is red
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -67,7 +69,7 @@ public class Minimax {
 
 		if (profondeur != 0) {
 			for (Etat etatEnfant : etat.getEnfants()) {
-				initialiserEtatEnfants(etatEnfant,profondeur-1,!isMax);
+				initialiserEtatEnfants(etatEnfant, profondeur - 1, !isMax);
 			}
 		}
 	}
@@ -86,7 +88,7 @@ public class Minimax {
 	public int minimax(Etat etat, int profondeur, boolean isMax) {
 
 		if (profondeur == 0 || this.isFinished(etat.grid)) {
-			return valeurDutilite(etat);
+			return valeurDutilite(etat, isMax);
 		}
 		if (isMax) {
 			int maxEval = -2147483648; // plus petit entier représentable (-2^31
@@ -100,15 +102,81 @@ public class Minimax {
 			int minEval = 2147483647; // plus grand entier représentable (2^31-1)
 			int eval;
 			for (Etat etatFils : etatParent.getEnfants()) {
-				eval = minimax(etatFils, profondeur - 1, false);
+				eval = minimax(etatFils, profondeur - 1, true);
 				minEval = minEval < eval ? minEval : eval;
 			}
 			return minEval;
 		}
 	}
 
-	public int valeurDutilite(Etat etat) {
-		return 0;
+	public int valeurDutilite(Etat etat, boolean isMax) {
+		if (this.isFinished(etat.getGrid())) {
+			return isMax ? 2147483647 : -2147483648;
+		}
+		int valeurUtilite = 0;
+		return valeurUtilite;
+	}
+
+	public int checkHoriPourValeurUtilite(Grid grid, boolean isMax) {
+		int valeur = 0;
+		int countTokenBlue = 0;
+		int countTokenRed = 0;
+		for (String[] ligne : grid.getGrille()) {
+			for (String colonne : ligne) {
+				switch (colonne) {
+				case "blue": {
+					countTokenBlue++;
+					if (countTokenRed > 0) {
+						countTokenBlue = 0;
+					}
+					if(countTokenBlue==3&&isMax) {
+						valeur+=100;
+					}
+					else if(countTokenBlue==2&&isMax) {
+						valeur+=10;
+					}
+					if(countTokenBlue==3&&!isMax) {
+						valeur+=500;
+					}
+					else if(countTokenBlue==2&&!isMax){
+						valeur+=50;
+					}
+					else if(countTokenBlue==1&&!isMax) {
+						valeur+=5;
+					}
+					break;
+				}
+				case "red": {
+					countTokenRed++;
+					if (countTokenBlue > 0) {
+						countTokenRed = 0;
+					}
+					if(countTokenRed==3&&!isMax) {
+						valeur+=100;
+					}
+					else if(countTokenRed==2&&!isMax) {
+						valeur+=10;
+					}
+					if(countTokenRed==3&&isMax) {
+						valeur+=500;
+					}
+					else if(countTokenRed==2&&isMax){
+						valeur+=50;
+					}
+					else if(countTokenRed==1&&isMax) {
+						valeur+=5;
+					}
+					break;
+				}
+				default: {
+					countTokenBlue=0;
+					countTokenRed=0;
+					break;
+				}
+				}
+			}
+		}
+		return valeur;
 	}
 
 	public boolean isFinished(Grid grid) {
@@ -150,6 +218,28 @@ public class Minimax {
 		}
 
 		return false;
+	}
+	
+	public int checkVertPourValeurUtilite(Grid grid,boolean isMax) {
+		int valeur = 0;
+		int countTokenBlue = 0;
+		int countTokenRed = 0;
+		for(int colonne=0;colonne<=grid.getNB_COLONNE();colonne++) {
+			for(int ligne=0;ligne<=grid.getNB_LIGNE();ligne++) {
+				switch(grid.getCase(ligne, colonne)) {
+				case "blue":{
+					break;
+				}
+				case "red" :{
+					break;
+				}
+				default:{
+					
+				}
+				}
+			}
+		}
+		return valeur;
 	}
 
 	public boolean checkVert(Grid grid) {
