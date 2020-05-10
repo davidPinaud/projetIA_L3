@@ -8,12 +8,23 @@ public class Etat {
 	private List<Etat> enfants = new Vector<Etat>();
 	Game game;
 	Grid grid;
-	int utilite, slash, antislash, vertical, horizontale;
+	int utilite=Integer.MIN_VALUE, slash, antislash, vertical, horizontale,heuristique2Alignement;
 
 	public Etat(Game game, Grid grid) {
 		this.game = game;
 		this.grid = grid;
 	}
+	
+
+	public int getHeuristique2Alignement() {
+		return heuristique2Alignement;
+	}
+
+
+	public void setHeuristique2Alignement(int heuristique2Alignement) {
+		this.heuristique2Alignement = heuristique2Alignement;
+	}
+
 
 	public Etat getParent() {
 		return parent;
@@ -59,7 +70,7 @@ public class Etat {
 	public String toString() {
 		return "\nutilité : " + utilite + "\ngrid : \n" + grid.toString() + "\n" + "antislash" + this.getAntislash()
 				+ "\nhorizontale" + this.getHorizontale() + "\nvertical" + this.getVertical() + "\nslash"
-				+ this.getSlash() + "\n\n";
+				+ this.getSlash() + "\nalignement 2 : "+this.getHeuristique2Alignement()+ "\n\n";
 	}
 
 	public int getSlash() {

@@ -3,23 +3,26 @@ package jeu;
 import java.util.List;
 import java.util.Vector;
 
-public class Minimax {
+public class Elagage { //alpha beta
 	private Game game;
 	private Etat etatParent;
 	private int[][] grilleHeuristique = { { 3, 4, 5, 7, 5, 4, 3 }, { 4, 6, 8, 10, 8, 6, 4 }, { 5, 8, 11, 13, 11, 8, 5 },
 			{ 5, 8, 11, 13, 11, 8, 5 }, { 4, 6, 8, 10, 8, 6, 4 }, { 3, 4, 5, 7, 5, 4, 3 }, };
 	private int profondeur;
-
-	public Minimax(Game game, int profondeur) {
+	int alpha=Integer.MIN_VALUE;
+	int beta=Integer.MAX_VALUE;
+	
+	public Elagage(Game game, int profondeur) {
 		super();
 		this.game = game;
 		etatParent = new Etat(game, game.getGrid());
 		this.profondeur = profondeur;
 		this.initialiserEtatEnfants(etatParent, this.profondeur, true); // initialisation des enfants d'etatParent
-		etatParent.setUtilite(this.minimax(this.etatParent, this.profondeur, true));
+		etatParent.setUtilite(this.elagageAlphaBeta(this.etatParent, this.profondeur, true,alpha,beta));
 		System.out.println(etatParent.getEnfants() + "===========================");
 	}
-
+		
+	
 	/**
 	 * Cette fonction permet de generer la liste des enfants possible pour l'état
 	 * Parent de ce minimax
@@ -92,28 +95,30 @@ public class Minimax {
 	 * @return un tableau d'entiers de taille 2 qui sont les coordonnées du jeton
 	 *         joué
 	 */
-	public int minimax(Etat etat, int profondeur, boolean isMax) {
+	public int elagageAlphaBeta(Etat etat, int profondeur, boolean isMax,int alpha,int beta) {
 		if (profondeur == -1 || this.isFinished(etat.grid)) {
 			return valeurDutilite(etat, isMax);
 		}
 		if (isMax) {
-			int maxEval = -2147483648; // plus petit entier représentable (-2^31)
-			int eval;
+			int v = Integer.MIN_VALUE; // plus petit entier représentable (-2^31)
 			for (Etat etatFils : etatParent.getEnfants()) {
-				eval = minimax(etatFils, profondeur - 1, false);
-				etatFils.setUtilite(eval);
-				maxEval = maxEval > eval ? maxEval : eval;
+				v = Math.max(v,elagageAlphaBeta(etatFils, profondeur - 1, false,alpha,beta));
+				alpha=Math.max(alpha, v);
+				if(alpha>=beta) {
+					break;
+				}
 			}
-			return maxEval;
+			return v;
 		} else {
-			int minEval = 2147483647; // plus grand entier représentable (2^31-1)
-			int eval;
+			int v = Integer.MAX_VALUE; // plus grand entier représentable (2^31-1)
 			for (Etat etatFils : etatParent.getEnfants()) {
-				eval = minimax(etatFils, profondeur - 1, true);
-				etatFils.setUtilite(eval);
-				minEval = minEval < eval ? minEval : eval;
+				v = Math.min(v,elagageAlphaBeta(etatFils, profondeur - 1, true,alpha,beta));
+				beta=Math.min(beta,v);
+				if(alpha>=beta) {
+					break;
+				}
 			}
-			return minEval;
+			return v;
 		}
 	}
 
@@ -137,6 +142,8 @@ public class Minimax {
 		etat.setHorizontale(hori);
 		etat.setVertical(verti);
 		etat.setHeuristique2Alignement(align);
+		
+		etat.setUtilite(valeurUtilite);
 
 		return valeurUtilite;
 	}
@@ -740,3 +747,4 @@ public class Minimax {
 		return this.etatParent;
 	}
 }
+

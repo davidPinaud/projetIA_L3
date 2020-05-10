@@ -11,10 +11,10 @@ import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -29,13 +29,14 @@ import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import jeu.Case;
+import jeu.Elagage;
 import jeu.Etat;
 import jeu.Game;
 import jeu.Grid;
 import jeu.Minimax;
-import views.GamePane.handler;
+import views.GamePaneMinMax.handler;
 
-public class GamePaneMinMax extends HBox {
+public class GamePaneElagage extends HBox {
 	// attributs
 	private GridPane grid = new GridPane();
 	private FlowPane flow = new FlowPane(Orientation.VERTICAL);
@@ -54,7 +55,7 @@ public class GamePaneMinMax extends HBox {
 	private static final int TAILLEFENETRELARGEUR = 1375;
 	private static final int TAILLEFENETRELONGUEUR = 925;
 
-	public GamePaneMinMax(Stage stage, String pseudo1, String pseudo2,String difficulte) {
+	public GamePaneElagage(Stage stage, String pseudo1, String pseudo2,String difficulte) {
 		profondeur=difficulte=="plutôt facile"?1:5;
 		this.pseudo1 = pseudo1;
 		this.pseudo2 = pseudo2;
@@ -204,20 +205,48 @@ public class GamePaneMinMax extends HBox {
 						}
 
 						// L'IA joue
-						Minimax minimax = new Minimax(GamePaneMinMax.this.game, profondeur); // calcul des états possible puis
+						Elagage minimax = new Elagage(GamePaneElagage.this.game, profondeur); // calcul des états possible puis
 																					// les utilités de ces états
 						Etat etatParent = minimax.getEtatParent();
 						System.out.println("etat Parent " + etatParent);
 						Etat etatChoisi = null;
 						Boolean notFound=true;
-
-						//Enfants qui ont la même valeur minimax que l'état parent
+						Vector<Etat> etatEnfantsConvenablesEtats=new Vector<>();
+						
 						for(Etat etatEnfant : etatParent.getEnfants()) {
 							if(etatEnfant.getUtilite()==2147483647) {
 								etatChoisi =etatEnfant;
 								notFound=false;
+								break;
 							}
+							/*else if(etatEnfant.getUtilite()==etatParent.getUtilite()){
+								etatEnfantsConvenablesEtats.add(etatEnfant);
+							}*/
 						}
+						
+						/*if(notFound&!etatEnfantsConvenablesEtats.isEmpty()) {
+							Random random=new Random();
+							int index=random.nextInt(etatEnfantsConvenablesEtats.size());
+							//choix d'un enfant convenable au hasard
+							etatChoisi=etatEnfantsConvenablesEtats.get(index);
+						}else {
+							Vector<Etat> etatEnfantsVector=new Vector<Etat>();
+							for(Etat etatEnfant : etatParent.getEnfants()) {
+								etatEnfantsVector.add(etatEnfant);
+							}
+							etatEnfantsVector.sort(new Comparator<Etat>() {
+								@Override
+								public int compare(Etat etat1, Etat etat2) {
+									return etat1.getUtilite()-etat2.getUtilite();
+								}
+							});
+							
+							Random random=new Random();
+							int index=etatEnfantsVector.size()-(random.nextInt(2)+1);
+							//prends au hasard un des 2 meilleurs états.
+							etatChoisi=etatEnfantsVector.get(index);
+						}*/
+						
 						if(notFound) {
 							Vector<Etat> etatEnfantsVector=new Vector<Etat>();
 							for(Etat etatEnfant : etatParent.getEnfants()) {
@@ -232,9 +261,10 @@ public class GamePaneMinMax extends HBox {
 							
 							Random random=new Random();
 							int index=etatEnfantsVector.size()-(random.nextInt(2)+1);
-							//prends au hasard un des 3 meilleurs états.
+							//prends au hasard un des 2 meilleurs états.
 							etatChoisi=etatEnfantsVector.get(index);
 						}
+						
 						
 						// on regarde les différences entre les grilles du jeu et celui de l'état
 						// suivant

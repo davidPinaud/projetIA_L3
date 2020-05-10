@@ -6,6 +6,7 @@ import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -31,19 +32,21 @@ public class GamePane extends HBox {
 	private FlowPane flow = new FlowPane(Orientation.VERTICAL);
 	private Game game = new Game();
 	private Button boutonQuitter = new Button("Quitter");
-	private Button relancerPartie= new Button("Relancer la partie");
+	private Button relancerPartie = new Button("Relancer la partie");
+	private Button retourAuMenuButton = new Button("Retour au Menu");
 	private Vector<Case> cases = new Vector<Case>();
-	private Label scorePlayer1=new Label("");
-	private Label scorePlayer2=new Label("");
-	private Label quiAGagne=new Label("");
-	private String pseudo1,pseudo2;
+	private Label scorePlayer1 = new Label("");
+	private Label scorePlayer2 = new Label("");
+	private Label quiAGagne = new Label("");
+	private String pseudo1, pseudo2;
 
 	private static final int TAILLEFENETRELARGEUR = 1375;
 	private static final int TAILLEFENETRELONGUEUR = 925;
 
 	public GamePane(Stage stage, String pseudo1, String pseudo2) {
-		this.pseudo1=pseudo1;
-		this.pseudo2=pseudo2;
+
+		this.pseudo1 = pseudo1;
+		this.pseudo2 = pseudo2;
 		stage.setHeight(TAILLEFENETRELONGUEUR);
 		stage.setWidth(TAILLEFENETRELARGEUR);
 		// Background image
@@ -58,45 +61,52 @@ public class GamePane extends HBox {
 		// permet d'initialiser la grille de depart (vide)
 		gridSetup();
 
-		
-		
-		
-		
-		//code for label
-		scorePlayer1.setText(pseudo1+" : "+game.getPlayer1().getScore());
-		scorePlayer2.setText(pseudo2+" : "+game.getPlayer2().getScore());
+		// code for label
+		scorePlayer1.setText(pseudo1 + " : " + game.getPlayer1().getScore());
+		scorePlayer2.setText(pseudo2 + " : " + game.getPlayer2().getScore());
 		scorePlayer1.setFont(Font.font("Verdana", 30));
 		scorePlayer2.setFont(Font.font("Verdana", 30));
 		flow.getChildren().add(this.scorePlayer1);
 		flow.getChildren().add(this.scorePlayer2);
 		flow.getChildren().add(this.quiAGagne);
-		FlowPane.setMargin(quiAGagne, new Insets(100,0,0,0));
-		FlowPane.setMargin(this.scorePlayer1, new Insets(10,0,0,0));
-		FlowPane.setMargin(this.scorePlayer2, new Insets(30,0,0,0));
-		
+		FlowPane.setMargin(quiAGagne, new Insets(100, 0, 0, 0));
+		FlowPane.setMargin(this.scorePlayer1, new Insets(10, 0, 0, 0));
+		FlowPane.setMargin(this.scorePlayer2, new Insets(30, 0, 0, 0));
+
 		// code for relancerPartie
-				relancerPartie.setOnAction((event) -> {
-					game=new Game(game.getPlayer1(),game.getPlayer2());
-					cases=new Vector<Case>();
-					gridSetup();
-					for (Case i : cases) {
-						grid.getChildren().add(i.getImageView());
-					}
-					
-				});
-				relancerPartie.setFont(Font.font("Verdana", 20));
-				relancerPartie.setMinWidth(150);
-				flow.getChildren().add(relancerPartie);
-				FlowPane.setMargin(this.relancerPartie, new Insets(550,0,0,0));
-				
-				// code for BoutonQuitter
-				boutonQuitter.setOnAction((event) -> {
-					Platform.exit();
-				});
-				boutonQuitter.setFont(Font.font("Verdana", 20));
-				boutonQuitter.setMinWidth(150);
-				flow.getChildren().add(boutonQuitter);
-				FlowPane.setMargin(this.boutonQuitter, new Insets(10,0,0,0));
+		relancerPartie.setOnAction((event) -> {
+			game = new Game(game.getPlayer1(), game.getPlayer2());
+			cases = new Vector<Case>();
+			gridSetup();
+			for (Case i : cases) {
+				grid.getChildren().add(i.getImageView());
+			}
+
+		});
+		relancerPartie.setFont(Font.font("Verdana", 20));
+		relancerPartie.setMinWidth(150);
+		flow.getChildren().add(relancerPartie);
+		FlowPane.setMargin(this.relancerPartie, new Insets(540, 0, 0, 0));
+		
+		retourAuMenuButton.setOnAction((event) -> {
+			stage.setScene(new Scene(new Menu(stage)));
+		});
+		flow.getChildren().add(retourAuMenuButton);
+		boutonQuitter.setFont(Font.font("Verdana", 20));
+		retourAuMenuButton.setMinWidth(150);
+		FlowPane.setMargin(retourAuMenuButton,new Insets(10,0,0,0));
+
+		// code for BoutonQuitter
+		boutonQuitter.setOnAction((event) -> {
+			Platform.exit();
+		});
+		boutonQuitter.setFont(Font.font("Verdana", 20));
+		boutonQuitter.setMinWidth(150);
+		flow.getChildren().add(boutonQuitter);
+		FlowPane.setMargin(this.boutonQuitter, new Insets(10, 0, 0, 0));
+
+		// code Retour menu
+		
 
 		// code for grid
 		grid.setGridLinesVisible(true);
@@ -151,43 +161,40 @@ public class GamePane extends HBox {
 					if (this.isThereMoreSpaceInColumn(colonne)) { // s'il y a de l'espace dans la colonne
 //						System.out.println(3);
 						// System.out.println(this.whichLinetoPutToken(colonne)+" "+colonne);
-						ligne=this.whichLinetoPutToken(colonne);
+						ligne = this.whichLinetoPutToken(colonne);
 						this.caseFromVectorWithCoordinates(ligne, colonne).getImageView()
 								.setImage(new Image("res/blueo.png"));
 						this.caseFromVectorWithCoordinates(ligne, colonne).setEmpty(false);
 						// System.out.println(cases);
 						game.setIsPlayer1Turn(false);
-						
+
 						try {
 							game.getGrid().setCase(ligne, colonne, "blue");
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-						//System.out.println(game.isFinished());
+						// System.out.println(game.isFinished());
 //						System.out.println(game.getGrid().getCase(5, 6));
 //						System.out.println(game.getGrid().getCase(4, 6));
 //						System.out.println(game.getGrid().getCase(3, 6));
 //						System.out.println(game.getGrid().getCase(2, 6));
 //						System.out.println(game.getGrid().getCase(1, 6));
 //						System.out.println(game.getGrid().getCase(0, 6));
-						if(game.isFinished()) {
-							quiAGagne.setText(pseudo1+" a gagné");
+						if (game.isFinished()) {
+							quiAGagne.setText(pseudo1 + " a gagné");
 							quiAGagne.setFont(Font.font("Verdana", 30));
 							game.getPlayer1().incrementScore(1);
-							scorePlayer1.setText(pseudo1+" : "+game.getPlayer1().getScore());
-							scorePlayer2.setText(pseudo2+" : "+game.getPlayer2().getScore());
-							game=new Game(game.getPlayer1(),game.getPlayer2());
-							cases=new Vector<Case>();
+							scorePlayer1.setText(pseudo1 + " : " + game.getPlayer1().getScore());
+							scorePlayer2.setText(pseudo2 + " : " + game.getPlayer2().getScore());
+							game = new Game(game.getPlayer1(), game.getPlayer2());
+							cases = new Vector<Case>();
 							gridSetup();
 							for (Case i : cases) {
 								grid.getChildren().add(i.getImageView());
 							}
-							
-							
-							
+
 						}
-						
 
 					}
 				}
@@ -196,13 +203,13 @@ public class GamePane extends HBox {
 //					System.out.println(3.5);
 
 					if (this.isThereMoreSpaceInColumn(colonne)) {
-						ligne=this.whichLinetoPutToken(colonne);
+						ligne = this.whichLinetoPutToken(colonne);
 //						System.out.println(4);
 						this.caseFromVectorWithCoordinates(ligne, colonne).getImageView()
 								.setImage(new Image("res/redx.png"));
 						this.caseFromVectorWithCoordinates(ligne, colonne).setEmpty(false);
 						game.setIsPlayer1Turn(false);
-						
+
 						try {
 //							System.out.println("hello3");
 							game.getGrid().setCase(ligne, colonne, "red");
@@ -211,65 +218,62 @@ public class GamePane extends HBox {
 							e.printStackTrace();
 						}
 						System.out.println(game.isFinished());
-						if(game.isFinished()) {
-							quiAGagne.setText(pseudo1+" a gagné");
+						if (game.isFinished()) {
+							quiAGagne.setText(pseudo1 + " a gagné");
 							quiAGagne.setFont(Font.font("Verdana", 30));
 							game.getPlayer1().incrementScore(1);
-							game=new Game(game.getPlayer1(),game.getPlayer2());
-							cases=new Vector<Case>();
+							game = new Game(game.getPlayer1(), game.getPlayer2());
+							cases = new Vector<Case>();
 							gridSetup();
 							for (Case i : cases) {
 								grid.getChildren().add(i.getImageView());
 							}
-							
-							scorePlayer1.setText(pseudo1+" : "+game.getPlayer1().getScore());
-							scorePlayer2.setText(pseudo2+" : "+game.getPlayer2().getScore());
-							
-						}
-						
 
-						
+							scorePlayer1.setText(pseudo1 + " : " + game.getPlayer1().getScore());
+							scorePlayer2.setText(pseudo2 + " : " + game.getPlayer2().getScore());
+
+						}
+
 					}
 
 				}
 
 			}
 
-			else {//else joueur 2
+			else {// else joueur 2
 //				System.out.println(5);
 				if (game.getPlayer2().getToken().contentEquals("blue")) {
 //					System.out.println(6);
 					if (this.isThereMoreSpaceInColumn(colonne)) {
-						ligne=this.whichLinetoPutToken(colonne);
+						ligne = this.whichLinetoPutToken(colonne);
 						System.out.println(7);
 						this.caseFromVectorWithCoordinates(ligne, colonne).getImageView()
 								.setImage(new Image("res/blueo.png"));
 						this.caseFromVectorWithCoordinates(ligne, colonne).setEmpty(false);
 						game.setIsPlayer1Turn(true);
-						
+
 						try {
 							game.getGrid().setCase(ligne, colonne, "blue");
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-						//System.out.println(game.isFinished());
-						if(game.isFinished()) {
-							quiAGagne.setText(pseudo2+" a gagné");
+						// System.out.println(game.isFinished());
+						if (game.isFinished()) {
+							quiAGagne.setText(pseudo2 + " a gagné");
 							quiAGagne.setFont(Font.font("Verdana", 30));
 							game.getPlayer2().incrementScore(1);
-							game=new Game(game.getPlayer1(),game.getPlayer2());
-							cases=new Vector<Case>();
+							game = new Game(game.getPlayer1(), game.getPlayer2());
+							cases = new Vector<Case>();
 							gridSetup();
 							for (Case i : cases) {
 								grid.getChildren().add(i.getImageView());
 							}
-							
-							scorePlayer1.setText(pseudo1+" : "+game.getPlayer1().getScore());
-							scorePlayer2.setText(pseudo2+" : "+game.getPlayer2().getScore());
-							
+
+							scorePlayer1.setText(pseudo1 + " : " + game.getPlayer1().getScore());
+							scorePlayer2.setText(pseudo2 + " : " + game.getPlayer2().getScore());
+
 						}
-						
 
 					}
 				}
@@ -277,13 +281,13 @@ public class GamePane extends HBox {
 				else {
 //					System.out.println(8);
 					if (this.isThereMoreSpaceInColumn(colonne)) {
-						ligne=this.whichLinetoPutToken(colonne);
+						ligne = this.whichLinetoPutToken(colonne);
 //						System.out.println(9);
 						this.caseFromVectorWithCoordinates(ligne, colonne).getImageView()
 								.setImage(new Image("res/redx.png"));
 						this.caseFromVectorWithCoordinates(ligne, colonne).setEmpty(false);
 						game.setIsPlayer1Turn(true);
-						
+
 						try {
 							game.getGrid().setCase(ligne, colonne, "red");
 						} catch (Exception e) {
@@ -291,32 +295,28 @@ public class GamePane extends HBox {
 							e.printStackTrace();
 						}
 						System.out.println(game.isFinished());
-						
-						if(game.isFinished()) {
-							quiAGagne.setText(pseudo2+" a gagné");
+
+						if (game.isFinished()) {
+							quiAGagne.setText(pseudo2 + " a gagné");
 							quiAGagne.setFont(Font.font("Verdana", 30));
 							game.getPlayer2().incrementScore(1);
-							scorePlayer1.setText(pseudo1+" : "+game.getPlayer1().getScore());
-							scorePlayer2.setText(pseudo2+" : "+game.getPlayer2().getScore());
-							game=new Game(game.getPlayer1(),game.getPlayer2());
-							cases=new Vector<Case>();
+							scorePlayer1.setText(pseudo1 + " : " + game.getPlayer1().getScore());
+							scorePlayer2.setText(pseudo2 + " : " + game.getPlayer2().getScore());
+							game = new Game(game.getPlayer1(), game.getPlayer2());
+							cases = new Vector<Case>();
 							gridSetup();
 							for (Case i : cases) {
 								grid.getChildren().add(i.getImageView());
 							}
-							
-							
-							
+
 						}
-						
-						
+
 //						System.out.println(game.getGrid().getCase(5, 6));
 //						System.out.println(game.getGrid().getCase(4, 6));
 //						System.out.println(game.getGrid().getCase(3, 6));
 //						System.out.println(game.getGrid().getCase(2, 6));
 //						System.out.println(game.getGrid().getCase(1, 6));
 //						System.out.println(game.getGrid().getCase(0, 6));
-
 
 					}
 				}
@@ -335,7 +335,7 @@ public class GamePane extends HBox {
 				}
 			}
 
-			return howManyTokens<6;
+			return howManyTokens < 6;
 		}
 
 		public int whichLinetoPutToken(int colonne) {

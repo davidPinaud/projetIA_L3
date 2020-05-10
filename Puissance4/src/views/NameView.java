@@ -22,6 +22,8 @@ import javafx.stage.Stage;
 
 public class NameView extends BorderPane{
 	private FlowPane flow = new FlowPane(Orientation.VERTICAL);
+	private BorderPane entetenBorderPane=new BorderPane();
+	private Button retourButton=new Button("< Retour");
 	private Text title = new Text("Veuillez rentrer vos pseudos");
 	private Button boutonConfirm=new Button("OK");
 	private Button boutonQuitter=new Button("Quitter");
@@ -30,6 +32,21 @@ public class NameView extends BorderPane{
 	public NameView(Stage stage) {
 		stage.setHeight(500);
 		stage.setWidth(800);
+		
+		retourButton.setOnAction((event)->{
+			stage.setScene(new Scene(new choiceTypeGame(stage)));
+		});
+		BorderPane.setAlignment(retourButton, Pos.CENTER);
+		entetenBorderPane.setLeft(retourButton);
+		
+		
+		title.setFont(Font.font("Verdana", 40));
+		title.setFill(Color.BEIGE);
+		BorderPane.setAlignment(title, Pos.CENTER);
+		entetenBorderPane.setCenter(title);
+		this.setTop(entetenBorderPane);
+
+
 		
 		pseudo1=new TextField();
 		pseudo2=new TextField();
@@ -60,11 +77,7 @@ public class NameView extends BorderPane{
 		FlowPane.setMargin(boutonQuitter, new Insets(50, 0, 0, 0));
 		
 
-		title.setFont(Font.font("Verdana", 40));
-		title.setFill(Color.BEIGE);
-		this.setTop(title);
-		BorderPane.setAlignment(title, Pos.CENTER);
-		BorderPane.setMargin(title, new Insets(30, 10, 10, 10)); // top right bottom left
+		
 		
 		BackgroundSize bSize = new BackgroundSize(100, 100, true, true, true, true);// double width, double height,
 		// boolean widthAsPercentage,

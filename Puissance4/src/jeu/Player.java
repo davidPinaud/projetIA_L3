@@ -50,22 +50,5 @@ public class Player {
 	}
 	
 	
-	/**
-	 * Méthode qui donne les actions possibles du joueur
-	 */
-	
-	public void Action(Grid grid) {
-		//TODO les actions possibles du joueur
-	}
-	
-	
-	/**
-	 * Méthode retournant l'utilité de l'action
-	 * @return
-	 */
-	public double utiliteAction() {
-		//TODO calcule l'utilité de l'action
-		return 0;
-	}
-	
+
 }

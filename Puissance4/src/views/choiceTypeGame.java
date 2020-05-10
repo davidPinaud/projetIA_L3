@@ -22,17 +22,26 @@ import javafx.stage.Stage;
 public class choiceTypeGame extends BorderPane {
 	private Button boutonHumainContreHumain, boutonHumainContreMinMax, boutonHumainContreElagage, boutonQuitter;
 	private FlowPane flow = new FlowPane(Orientation.VERTICAL);
+	private BorderPane entetenBorderPane=new BorderPane();
+	private Button retourButton=new Button("< Retour");
 	private Text title = new Text("Veuillez choisir un mode de jeu");
 
 	public choiceTypeGame(Stage stage) {
 		stage.setHeight(500);
 		stage.setWidth(800);
 
+		retourButton.setOnAction((event)->{
+			stage.setScene(new Scene(new Menu(stage)));	
+		});
+		BorderPane.setAlignment(retourButton, Pos.CENTER);
+		entetenBorderPane.setLeft(retourButton);
+		
+		
 		title.setFont(Font.font("Verdana", 40));
 		title.setFill(Color.BEIGE);
-		this.setTop(title);
 		BorderPane.setAlignment(title, Pos.CENTER);
-		BorderPane.setMargin(title, new Insets(30, 10, 10, 10)); // top right bottom left
+		entetenBorderPane.setCenter(title);
+		this.setTop(entetenBorderPane);
 
 		this.boutonHumainContreHumain = new Button("Humain vs Humain");
 		this.boutonHumainContreMinMax = new Button("Humain vs MinMax");
@@ -57,16 +66,16 @@ public class choiceTypeGame extends BorderPane {
 
 		// code humain contre minmax
 		this.boutonHumainContreMinMax.setOnAction((event) -> {
-			stage.setScene(new Scene(new NameViewMiniMax(stage)));
+			stage.setScene(new Scene(new NameViewMiniMax(stage,1)));
 		});
 		this.boutonHumainContreMinMax.setFont(Font.font("Verdana", 20));
 		this.boutonHumainContreMinMax.setMinWidth(150);
 		flow.getChildren().add(this.boutonHumainContreMinMax);
 		FlowPane.setMargin(this.boutonHumainContreMinMax, new Insets(10, 0, 0, 0));
 
-		// code humain contre humain
+		// code humain contre elagage
 		this.boutonHumainContreElagage.setOnAction((event) -> {
-			// TODO
+			stage.setScene(new Scene(new NameViewMiniMax(stage,2)));
 		});
 		this.boutonHumainContreElagage.setFont(Font.font("Verdana", 20));
 		this.boutonHumainContreElagage.setMinWidth(150);
