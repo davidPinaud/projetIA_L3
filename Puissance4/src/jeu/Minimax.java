@@ -97,7 +97,7 @@ public class Minimax {
 			return valeurDutilite(etat, isMax);
 		}
 		if (isMax) {
-			int maxEval = -2147483648; // plus petit entier représentable (-2^31)
+			int maxEval = Integer.MIN_VALUE; // plus petit entier représentable (-2^31)
 			int eval;
 			for (Etat etatFils : etatParent.getEnfants()) {
 				eval = minimax(etatFils, profondeur - 1, false);
@@ -106,7 +106,7 @@ public class Minimax {
 			}
 			return maxEval;
 		} else {
-			int minEval = 2147483647; // plus grand entier représentable (2^31-1)
+			int minEval = Integer.MAX_VALUE; // plus grand entier représentable (2^31-1)
 			int eval;
 			for (Etat etatFils : etatParent.getEnfants()) {
 				eval = minimax(etatFils, profondeur - 1, true);
