@@ -77,6 +77,18 @@ public class Grid {
 		return stb.toString();
 	}
 	
+	public int nombreJetonDansTableau() {
+		int nbJeton=0;
+		for(int ligne=0;ligne<=this.getNB_LIGNE();ligne++) {
+			for(int colonne=0;colonne<=this.getNB_COLONNE();colonne++) {
+				if(this.getCase(ligne, colonne)=="blue"||this.getCase(ligne, colonne)=="red") {
+					nbJeton++;
+				}
+			}
+		}
+		return nbJeton;
+	}
+	
 	public void copyGrid(Grid gridColler) {
 		for(int ligne=0;ligne<=this.getNB_LIGNE();ligne++) {
 			for(int colonne=0;colonne<=this.getNB_COLONNE();colonne++) {

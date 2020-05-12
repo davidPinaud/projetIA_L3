@@ -720,16 +720,18 @@ public class Minimax {
 
 	public int heuristique2AlignementsGagnants(Grid grid, boolean isMax) {
 		int heurs = 0;
+		int nombreDeJetonsDansTableau=grid.nombreJetonDansTableau();
+		int facteur=(nombreDeJetonsDansTableau==0?20:20/nombreDeJetonsDansTableau);
 		for (int l = 0; l < 6; l++) {
 			for (int c = 0; c < 7; c++) {
 				if (grid.getCase(l, c).equals("blue") && isMax) {
-					heurs -= 10 * this.grilleHeuristique[l][c];
+					heurs -=  facteur*this.grilleHeuristique[l][c];
 				} else if (grid.getCase(l, c).equals("red") && isMax) {
-					heurs += 10 * this.grilleHeuristique[l][c];
+					heurs += facteur * this.grilleHeuristique[l][c];
 				} else if (grid.getCase(l, c).equals("blue") && !isMax) {
-					heurs += 10 * this.grilleHeuristique[l][c];
+					heurs += facteur * this.grilleHeuristique[l][c];
 				} else if (grid.getCase(l, c).equals("red") && !isMax) {
-					heurs -= 10 * this.grilleHeuristique[l][c];
+					heurs -= facteur * this.grilleHeuristique[l][c];
 				}
 			}
 		}

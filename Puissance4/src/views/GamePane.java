@@ -1,5 +1,6 @@
 package views;
 
+import java.util.Optional;
 import java.util.Vector;
 
 import javafx.application.Platform;
@@ -7,8 +8,11 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -86,7 +90,7 @@ public class GamePane extends HBox {
 		relancerPartie.setFont(Font.font("Verdana", 20));
 		relancerPartie.setMinWidth(150);
 		flow.getChildren().add(relancerPartie);
-		FlowPane.setMargin(this.relancerPartie, new Insets(540, 0, 0, 0));
+		FlowPane.setMargin(this.relancerPartie, new Insets(500, 0, 0, 0));
 		
 		retourAuMenuButton.setOnAction((event) -> {
 			stage.setScene(new Scene(new Menu(stage)));
@@ -187,11 +191,25 @@ public class GamePane extends HBox {
 							game.getPlayer1().incrementScore(1);
 							scorePlayer1.setText(pseudo1 + " : " + game.getPlayer1().getScore());
 							scorePlayer2.setText(pseudo2 + " : " + game.getPlayer2().getScore());
-							game = new Game(game.getPlayer1(), game.getPlayer2());
-							cases = new Vector<Case>();
-							gridSetup();
-							for (Case i : cases) {
-								grid.getChildren().add(i.getImageView());
+							Alert alert = new Alert(AlertType.CONFIRMATION);
+							alert.setTitle("Partie terminée");
+							alert.setHeaderText(pseudo1 + " a gagné");
+							alert.setContentText(pseudo1 + " : " + game.getPlayer1().getScore() + "\n" + pseudo2 + " : "
+									+ game.getPlayer2().getScore());
+							ButtonType buttonTypeRelancerButtonType = new ButtonType("Relancer une partie");
+							ButtonType buttonTypeQuitterLeJeuButtonType = new ButtonType("Quitter le jeu");
+							alert.getButtonTypes().setAll(buttonTypeRelancerButtonType,
+									buttonTypeQuitterLeJeuButtonType);
+							Optional<ButtonType> result = alert.showAndWait();
+							if (result.get() == buttonTypeQuitterLeJeuButtonType) {
+								Platform.exit();
+							} else if (result.get() == buttonTypeRelancerButtonType) {
+								game = new Game(game.getPlayer1(), game.getPlayer2());
+								cases = new Vector<Case>();
+								gridSetup();
+								for (Case i : cases) {
+									grid.getChildren().add(i.getImageView());
+								}
 							}
 
 						}
@@ -222,15 +240,28 @@ public class GamePane extends HBox {
 							quiAGagne.setText(pseudo1 + " a gagné");
 							quiAGagne.setFont(Font.font("Verdana", 30));
 							game.getPlayer1().incrementScore(1);
-							game = new Game(game.getPlayer1(), game.getPlayer2());
-							cases = new Vector<Case>();
-							gridSetup();
-							for (Case i : cases) {
-								grid.getChildren().add(i.getImageView());
-							}
-
 							scorePlayer1.setText(pseudo1 + " : " + game.getPlayer1().getScore());
 							scorePlayer2.setText(pseudo2 + " : " + game.getPlayer2().getScore());
+							Alert alert = new Alert(AlertType.CONFIRMATION);
+							alert.setTitle("Partie terminée");
+							alert.setHeaderText(pseudo1 + " a gagné");
+							alert.setContentText(pseudo1 + " : " + game.getPlayer1().getScore() + "\n" + pseudo2 + " : "
+									+ game.getPlayer2().getScore());
+							ButtonType buttonTypeRelancerButtonType = new ButtonType("Relancer une partie");
+							ButtonType buttonTypeQuitterLeJeuButtonType = new ButtonType("Quitter le jeu");
+							alert.getButtonTypes().setAll(buttonTypeRelancerButtonType,
+									buttonTypeQuitterLeJeuButtonType);
+							Optional<ButtonType> result = alert.showAndWait();
+							if (result.get() == buttonTypeQuitterLeJeuButtonType) {
+								Platform.exit();
+							} else if (result.get() == buttonTypeRelancerButtonType) {
+								game = new Game(game.getPlayer1(), game.getPlayer2());
+								cases = new Vector<Case>();
+								gridSetup();
+								for (Case i : cases) {
+									grid.getChildren().add(i.getImageView());
+								}
+							}
 
 						}
 
@@ -262,16 +293,29 @@ public class GamePane extends HBox {
 						if (game.isFinished()) {
 							quiAGagne.setText(pseudo2 + " a gagné");
 							quiAGagne.setFont(Font.font("Verdana", 30));
-							game.getPlayer2().incrementScore(1);
-							game = new Game(game.getPlayer1(), game.getPlayer2());
-							cases = new Vector<Case>();
-							gridSetup();
-							for (Case i : cases) {
-								grid.getChildren().add(i.getImageView());
-							}
-
+							game.getPlayer1().incrementScore(1);
 							scorePlayer1.setText(pseudo1 + " : " + game.getPlayer1().getScore());
 							scorePlayer2.setText(pseudo2 + " : " + game.getPlayer2().getScore());
+							Alert alert = new Alert(AlertType.CONFIRMATION);
+							alert.setTitle("Partie terminée");
+							alert.setHeaderText(pseudo1 + " a gagné");
+							alert.setContentText(pseudo1 + " : " + game.getPlayer1().getScore() + "\n" + pseudo2 + " : "
+									+ game.getPlayer2().getScore());
+							ButtonType buttonTypeRelancerButtonType = new ButtonType("Relancer une partie");
+							ButtonType buttonTypeQuitterLeJeuButtonType = new ButtonType("Quitter le jeu");
+							alert.getButtonTypes().setAll(buttonTypeRelancerButtonType,
+									buttonTypeQuitterLeJeuButtonType);
+							Optional<ButtonType> result = alert.showAndWait();
+							if (result.get() == buttonTypeQuitterLeJeuButtonType) {
+								Platform.exit();
+							} else if (result.get() == buttonTypeRelancerButtonType) {
+								game = new Game(game.getPlayer1(), game.getPlayer2());
+								cases = new Vector<Case>();
+								gridSetup();
+								for (Case i : cases) {
+									grid.getChildren().add(i.getImageView());
+								}
+							}
 
 						}
 
@@ -299,14 +343,28 @@ public class GamePane extends HBox {
 						if (game.isFinished()) {
 							quiAGagne.setText(pseudo2 + " a gagné");
 							quiAGagne.setFont(Font.font("Verdana", 30));
-							game.getPlayer2().incrementScore(1);
+							game.getPlayer1().incrementScore(1);
 							scorePlayer1.setText(pseudo1 + " : " + game.getPlayer1().getScore());
 							scorePlayer2.setText(pseudo2 + " : " + game.getPlayer2().getScore());
-							game = new Game(game.getPlayer1(), game.getPlayer2());
-							cases = new Vector<Case>();
-							gridSetup();
-							for (Case i : cases) {
-								grid.getChildren().add(i.getImageView());
+							Alert alert = new Alert(AlertType.CONFIRMATION);
+							alert.setTitle("Partie terminée");
+							alert.setHeaderText(pseudo1 + " a gagné");
+							alert.setContentText(pseudo1 + " : " + game.getPlayer1().getScore() + "\n" + pseudo2 + " : "
+									+ game.getPlayer2().getScore());
+							ButtonType buttonTypeRelancerButtonType = new ButtonType("Relancer une partie");
+							ButtonType buttonTypeQuitterLeJeuButtonType = new ButtonType("Quitter le jeu");
+							alert.getButtonTypes().setAll(buttonTypeRelancerButtonType,
+									buttonTypeQuitterLeJeuButtonType);
+							Optional<ButtonType> result = alert.showAndWait();
+							if (result.get() == buttonTypeQuitterLeJeuButtonType) {
+								Platform.exit();
+							} else if (result.get() == buttonTypeRelancerButtonType) {
+								game = new Game(game.getPlayer1(), game.getPlayer2());
+								cases = new Vector<Case>();
+								gridSetup();
+								for (Case i : cases) {
+									grid.getChildren().add(i.getImageView());
+								}
 							}
 
 						}

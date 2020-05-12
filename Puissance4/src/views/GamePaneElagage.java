@@ -98,7 +98,7 @@ public class GamePaneElagage extends HBox {
 		relancerPartie.setFont(Font.font("Verdana", 20));
 		relancerPartie.setMinWidth(150);
 		flow.getChildren().add(relancerPartie);
-		FlowPane.setMargin(this.relancerPartie, new Insets(550, 0, 0, 0));
+		FlowPane.setMargin(this.relancerPartie, new Insets(500, 0, 0, 0));
 		retourAuMenuButton.setOnAction((event) -> {
 			stage.setScene(new Scene(new Menu(stage)));
 		});
