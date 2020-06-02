@@ -19,19 +19,24 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-
+/**
+ * Classe qui permet au joueur de quitter ou jouer, un option pour une fenetre parametre est aussi considéré
+ * @author davidpinaud
+ *
+ */
 public class Menu extends BorderPane{
 	
 	private Button boutonJouer,boutonQuitter;
 	private FlowPane flow=new FlowPane(Orientation.VERTICAL);
 	private Text title=new Text("Puissance 4");
 	
-	
+	/**
+	 * Constructeur qui permet d'initialiser l'interface
+	 * @param stage Le stage qui pour changer de fenetre
+	 */
 	public Menu(Stage stage) {
 		boutonJouer=new Button("Jouer");
 		boutonQuitter=new Button("Quitter");
-		
-		
 		
 		//code for title placement and font
 		title.setFont(Font.font("Verdana",80));

@@ -15,14 +15,17 @@ import javafx.scene.layout.BackgroundPosition;
 import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.BorderRepeat;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-
+/**
+ * Classe permettant d'afficher l'interface graphique pour le choix des pseudos
+ * pour un jeu entre un humain et MinMax ou entre un humain et Elagage
+ * @author davidpinaud
+ *
+ */
 public class NameViewMiniMax extends BorderPane {
 	private FlowPane flow = new FlowPane(Orientation.VERTICAL);
 	private Text title = new Text("Veuillez rentrer votre pseudo");

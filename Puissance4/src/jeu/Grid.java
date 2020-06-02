@@ -1,7 +1,15 @@
 package jeu;
 
+/**
+ * Classe permettant de représenter la grille d'un jeu
+ * 
+ * @author davidpinaud
+ *
+ */
 public class Grid {
-
+	//La grille est initialisé a des string vide
+	// On utilise un double tableau de String et non une Liste
+	//Les tailles sont fixes
 	private String[][] grille = { 
 			{ "", "", "", "", "", "", "" },
 			{ "", "", "", "", "", "", "" },
@@ -12,6 +20,7 @@ public class Grid {
 
 	private final int NB_LIGNE = 5;
 	private final int NB_COLONNE = 6;
+
 
 	public Grid() {
 
@@ -36,7 +45,13 @@ public class Grid {
 	public String getCase(int ligne, int colonne) {
 		return this.grille[ligne][colonne];
 	}
-
+	/**
+	 * Modifie une case de la grille, le jeton doit etre rouge ou bleu
+	 * @param ligne ligne ou ajouter le jeton
+	 * @param colonne colonne ou ajouter le jeton
+	 * @param token jeton a ajouter
+	 * @throws Exception Si un mauvais jeton est inséré
+	 */
 	public void setCase(int ligne, int colonne, String token) throws Exception {
 		if (equalsToken(token)) {
 //		System.out.println("hello1");
@@ -63,9 +78,8 @@ public class Grid {
 	}
 
 	/**
-	 * Returns Strings of Grid to display on console
+	 * Permet d'afficher la grille
 	 */
-
 	public String toString() {
 		StringBuilder stb=new StringBuilder();
 		for(String [] ligne:this.getGrille()) {
@@ -76,7 +90,10 @@ public class Grid {
 		}
 		return stb.toString();
 	}
-	
+	/**
+	 * Méthode permettant de calculer le nombre de Jeton dans le tableau
+	 * @return Un entier représentant le nombre de Jeton dans le tableau
+	 */
 	public int nombreJetonDansTableau() {
 		int nbJeton=0;
 		for(int ligne=0;ligne<=this.getNB_LIGNE();ligne++) {
@@ -89,6 +106,10 @@ public class Grid {
 		return nbJeton;
 	}
 	
+	/**
+	 * Méthode permettant de copier la grille courante dans une nouvelle grille
+	 * @param gridColler La grille ou il faut coller
+	 */
 	public void copyGrid(Grid gridColler) {
 		for(int ligne=0;ligne<=this.getNB_LIGNE();ligne++) {
 			for(int colonne=0;colonne<=this.getNB_COLONNE();colonne++) {

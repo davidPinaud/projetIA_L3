@@ -33,8 +33,7 @@ import jeu.Elagage;
 import jeu.Etat;
 import jeu.Game;
 import jeu.Grid;
-import jeu.Minimax;
-import views.GamePaneMinMax.handler;
+
 
 public class GamePaneElagage extends HBox {
 	// attributs
@@ -211,7 +210,7 @@ public class GamePaneElagage extends HBox {
 						System.out.println("etat Parent " + etatParent);
 						Etat etatChoisi = null;
 						Boolean notFound=true;
-						Vector<Etat> etatEnfantsConvenablesEtats=new Vector<>();
+						//Vector<Etat> etatEnfantsConvenablesEtats=new Vector<>();
 						
 						for(Etat etatEnfant : etatParent.getEnfants()) {
 							if(etatEnfant.getUtilite()==2147483647) {
@@ -324,7 +323,11 @@ public class GamePaneElagage extends HBox {
 			}
 
 		}
-
+		/**
+		 * Méthode qui permet de savoir s'il y a encore un espace dans une certaine colonne donnée
+		 * @param colonne un entier qui est le numéro de la colonne a tester
+		 * @return un boolean qui indique si il reste une ligne non occupé dans la colonne donnée en paramètre
+		 */
 		public boolean isThereMoreSpaceInColumn(int colonne) {
 			int howManyTokens = 0;
 			for (Case c : cases) {
@@ -337,7 +340,12 @@ public class GamePaneElagage extends HBox {
 
 			return howManyTokens < 6;
 		}
-
+		/**
+		 * Méthode qui permet de determiner selon la colonne donnée, quelle est la premiere colonne de libre afin d'y inserer un jeton.
+		 * Elle doit etre appelée après la méthode isThereMoreSpaceInColumn
+		 * @param colonne La colonne a tester
+		 * @return un entier qui est la ligne de la premiere case vide dans la colonne donnée
+		 */
 		public int whichLinetoPutToken(int colonne) {
 			Vector<Case> cases2 = new Vector<>();
 			for (Case c : cases) {
@@ -355,7 +363,10 @@ public class GamePaneElagage extends HBox {
 			}
 			return -1;
 		}
-
+		/**
+		 * Méthode qui sert à ordonner un vecteur de Case selon leur ligne (Tri par selection complexité en O(1764)=O(42^2)=O(n^2))
+		 * @param cases2 Le Vector à ordonner
+		 */
 		public void sortFromLine(Vector<Case> cases2) {
 			Case minCase, temp;
 			int indexOfSmallest;
@@ -369,7 +380,12 @@ public class GamePaneElagage extends HBox {
 				}
 			}
 		}
-
+		/**
+		 * Méthode qui sert à trouver l'index de la plus petite case d'un vecteur de case en commencant à l'indice i
+		 * @param i L'indice ou commencer la recherche
+		 * @param cases2
+		 * @return
+		 */
 		public int indexOfMinList(int i, Vector<Case> cases2) {
 			Case min = cases2.get(i);
 			int indexMin = i;
@@ -382,7 +398,12 @@ public class GamePaneElagage extends HBox {
 			}
 			return indexMin;
 		}
-
+		/**
+		 * Méthode qui sert à trouver un objet case du vecteur de case selon ses coordonnées
+		 * @param x Ligne de la case
+		 * @param y Colonne de la case
+		 * @return la case
+		 */
 		public Case caseFromVectorWithCoordinates(int x, int y) {
 			for (Case c : cases) {
 				if ((c.getX() == x) && (c.getY() == y)) {
@@ -392,6 +413,7 @@ public class GamePaneElagage extends HBox {
 			System.out.println("rien trouvé");
 			return null;
 		}
+
 
 	}
 

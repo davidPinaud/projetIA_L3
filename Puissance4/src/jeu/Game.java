@@ -8,9 +8,9 @@ public class Game {
 	Boolean isplayer1Turn;
 	
 	/**
-	 * Méthode qui determine si le jeu est fini (par victoire ou égalité)
+	 * Initialisation de la premiere partie,
+	 * les joueurs et la grille sont crées
 	 */
-	
 	public Game() {
 		this.isplayer1Turn=true;
 		try {
@@ -23,15 +23,25 @@ public class Game {
 		grid=new Grid();
 	}
 	
-	
+	/**
+	 * Initialisation pour les parties suivantes
+	 * Méthode créee pour que deux joueurs puissent jouer plusieurs parties ensemble.
+	 * Les deux joueurs existent déjà mais on crée une nouvelle grille
+	 * @param player1 Le joueur 1
+	 * @param player2 le joueur 2
+	 */
 	public Game(Player player1,Player player2) {
 		this.isplayer1Turn=true;
 		this.player1=player1;
 		this.player2=player2;
 		grid=new Grid();
-
-
 	}
+	
+	/**
+	 * Test de terminaison pour le jeu, utilisé lors d'un jeu entre deux joueurs humain,
+	 * le test pour les jeux contre une IA est directement dans leur classe.
+	 * @return un boolean qui détermine si le jeu est fini
+	 */
 	public boolean isFinished() {
 		if(this.checkHori() || this.checkVert() || this.checkSlash() || this.checkAntiSlash()) {
 			return true;
@@ -41,7 +51,11 @@ public class Game {
 	
 	
 	
-	
+	/**
+	 * Une des quatre fonctions test, elle permet de regarder si il y a des alignements horizontaux
+	 * @param grid La grille a tester
+	 * @return un boolean true s'il existe un alignement, false sinon
+	 */
 	public boolean checkHori()
 	{
 		int countToken1 = 0;
@@ -81,6 +95,11 @@ public class Game {
 
 		return false;
 	}
+	/**
+	 * Une des quatre fonctions test, elle permet de regarder si il y a des alignements verticaux
+	 * @param grid La grille a tester
+	 * @return un boolean true s'il existe un alignement, false sinon
+	 */
 	public boolean checkVert()
 	{
 		int countToken1 = 0;
@@ -119,7 +138,11 @@ public class Game {
 		}
 		return false;
 	}
-
+	/**
+	 * Une des quatre fonctions test, elle permet de regarder si il y a des alignements dans la direction "slash"
+	 * @param grid La grille a tester
+	 * @return un boolean true s'il existe un alignement, false sinon
+	 */
 	public boolean checkSlash()
 	{
 		int countToken1 = 0;
@@ -189,6 +212,11 @@ public class Game {
 		}
 		return false;
 	}
+	/**
+	 * Une des quatre fonctions test, elle permet de regarder si il y a des alignements dans la direction "anti-slash"
+	 * @param grid La grille a tester
+	 * @return un boolean true s'il existe un alignement, false sinon
+	 */
 	public boolean checkAntiSlash()
 	{
 		int countToken1 = 0;

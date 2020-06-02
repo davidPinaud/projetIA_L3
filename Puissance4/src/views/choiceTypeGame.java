@@ -19,6 +19,14 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+/**
+ * Classe qui permet de faire le choix sur le type de jeu voulu
+ * Permet de choisir entre
+ * Humain vs Humain
+ * MinMax vs Humain Elagage vs Humain
+ * @author davidpinaud
+ *
+ */
 public class choiceTypeGame extends BorderPane {
 	private Button boutonHumainContreHumain, boutonHumainContreMinMax, boutonHumainContreElagage, boutonQuitter;
 	private FlowPane flow = new FlowPane(Orientation.VERTICAL);

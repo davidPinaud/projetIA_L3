@@ -3,11 +3,18 @@ package jeu;
 import java.util.List;
 import java.util.Vector;
 
+/**
+ * Classe permettant de représenter un état du jeu
+ * @author davidpinaud
+ *
+ */
 public class Etat {
-	private Etat parent;
-	private List<Etat> enfants = new Vector<Etat>();
-	Game game;
-	Grid grid;
+	private Etat parent; //Son état parent s'il en a un
+	private List<Etat> enfants = new Vector<Etat>(); // ses enfants s'il en a
+	Game game; // Le jeu auquel cet Etat peut appartenir
+	Grid grid; // La grille associé a cet etat
+	//L'utilité de cet état, initialisé à la valeur minimale d'un entier
+	//Il y a aussi les composantes de cette utilité
 	int utilite=Integer.MIN_VALUE, slash, antislash, vertical, horizontale,heuristique2Alignement;
 
 	public Etat(Game game, Grid grid) {
@@ -66,6 +73,9 @@ public class Etat {
 		this.utilite = utilite;
 	}
 
+	/**
+	 * Permet d'afficher la grille et les valeurs d'utilité
+	 */
 	@Override
 	public String toString() {
 		return "\nutilité : " + utilite + "\ngrid : \n" + grid.toString() + "\n" + "antislash" + this.getAntislash()

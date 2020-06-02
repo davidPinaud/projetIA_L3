@@ -20,6 +20,12 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+/**
+ * Classe permettant d'afficher l'interface graphique pour le choix des pseudos
+ * pour un jeu entre humain
+ * @author davidpinaud
+ *
+ */
 public class NameView extends BorderPane{
 	private FlowPane flow = new FlowPane(Orientation.VERTICAL);
 	private BorderPane entetenBorderPane=new BorderPane();

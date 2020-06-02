@@ -3,6 +3,11 @@ package jeu;
 import java.util.List;
 import java.util.Vector;
 
+/**
+ * classe permettant de calculer le coup suivant d'une IA basée sur l'algorithme MinMax
+ * @author davidpinaud
+ *
+ */
 public class Minimax {
 	private Game game;
 	private Etat etatParent;
@@ -116,7 +121,13 @@ public class Minimax {
 			return minEval;
 		}
 	}
-
+	/**
+	 * Méthode qui permet de donner une valeur d'utilité à l'état analysé en
+	 * appellant les deux heurisitique implémentées
+	 * @param etat L'état a analyser
+	 * @param isMax Boolean pour savoir si l'appelant est max
+	 * @return Un entier correspondant à la valeur d'utilité de l'état
+	 */
 	public int valeurDutilite(Etat etat, boolean isMax) {
 		if (this.isFinished(etat.getGrid())) {
 			etat.setUtilite(isMax ? -2147483648 : 2147483647);
@@ -141,604 +152,672 @@ public class Minimax {
 		return valeurUtilite;
 	}
 
-	public int checkHoriPourValeurUtilite(Grid grid, boolean isMax) {
-		int valeur = 0;
-		int countTokenBlue = 0;
-		int countTokenRed = 0;
-		int ligneNb = 0, colonneNb = 0;
-		for (String[] ligne : grid.getGrille()) {
-			for (String colonne : ligne) {
-				switch (colonne) {
-				case "blue": {
-					countTokenBlue++;
-					if (countTokenRed > 0) {
+	//Constante déterminant la premiere heuristique
+		final static int POSITIVE_3=200;
+		final static int NEGATIVE_3=-350;
+		final static int NEGATIVE_3_BIS=-600;
+		final static int POSITIVE_2=10;
+		final static int NEGATIVE_2=-50;
+		final static int NEGATIVE_1=-5;
+		
+		/**
+		 * Méthode qui permet de calculer la valeur d'utilité d'une grille en comptant les alignements horizontaux 
+		 * des jetons
+		 * @param grid Grille a analyser
+		 * @param isMax Boolean pour savoir si l'appelant est max ou pas
+		 * @return Une valeur entiere correspondant a la valeur d'utilité horizontale pour l'appelant
+		 */
+		public int checkHoriPourValeurUtilite(Grid grid, boolean isMax) {
+			int valeur = 0;
+			int countTokenBlue = 0;
+			int countTokenRed = 0;
+			int ligneNb = 0, colonneNb = 0;
+			for (String[] ligne : grid.getGrille()) {
+				for (String colonne : ligne) {
+					switch (colonne) {
+					case "blue": {
+						countTokenBlue++;
+						if (countTokenRed > 0) {
+							countTokenBlue = 0;
+						}
+						if (countTokenBlue == 3 && !isMax) {//Si il y a trois jetons alignés horizontalement
+							if (colonneNb + 1 <= 6) { //Si la prochaine case existe
+								if (grid.getCase(ligneNb, colonneNb + 1) == "") { //si la prochaine case est vide
+									//System.out.println("hey4");
+									valeur += POSITIVE_3;
+								}
+							}
+							if (colonneNb - 3 >= 0) {//si la case d'avant les jetons existe
+								if (grid.getCase(ligneNb, colonneNb - 3) == "") {//si elle est vide
+									//System.out.println("hey5");
+
+									valeur += POSITIVE_3;
+								}
+							}
+							if (colonneNb + 1 <= 6) {//si les deux existent et sont vides
+								if (grid.getCase(ligneNb, colonneNb + 1) == "") {
+									if (colonneNb - 3 >= 0) {
+										if (grid.getCase(ligneNb, colonneNb - 3) == "") {
+										//	System.out.println("hey5");
+
+											valeur += POSITIVE_3;
+										}
+									}
+								}
+							}
+						} else if (countTokenBlue == 2 && !isMax) {
+							valeur += POSITIVE_2;
+						}
+						if (countTokenBlue == 3 && isMax) {
+							if (colonneNb + 1 <= 6) {
+								if (grid.getCase(ligneNb, colonneNb + 1) == "") {
+									//System.out.println("hey1");
+									valeur += NEGATIVE_3;
+								}
+							}
+							if (colonneNb - 3 >= 0) {
+								if (grid.getCase(ligneNb, colonneNb - 3) == "") {
+									//System.out.println("hey2");
+									valeur += NEGATIVE_3;
+								}
+							}
+							if (colonneNb + 1 <= 6) { // si bleu est en passe de gagner
+								if (grid.getCase(ligneNb, colonneNb + 1) == "") {
+									if (colonneNb - 3 >= 0) {
+										if (grid.getCase(ligneNb, colonneNb - 3) == "") {
+											//System.out.println("hey3");
+											valeur += NEGATIVE_3_BIS;
+										}
+									}
+								}
+							}
+						} else if (countTokenBlue == 2 && isMax) {
+							valeur += NEGATIVE_2;
+						} else if (countTokenBlue == 1 && isMax) {
+							valeur += NEGATIVE_1;
+						}
+						break;
+					}
+					case "red": {
+						countTokenRed++;
+						if (countTokenBlue > 0) {
+							countTokenRed = 0;
+						}
+						if (countTokenRed == 3 && isMax) {
+							if (colonneNb + 1 <= 6) {
+								if (grid.getCase(ligneNb, colonneNb + 1) == "") {
+									valeur += POSITIVE_3;
+								}
+							}
+							if (colonneNb - 3 >= 0) {
+								if (grid.getCase(ligneNb, colonneNb - 3) == "") {
+									valeur += POSITIVE_3;
+								}
+							}
+							if (colonneNb + 1 <= 6) {
+								if (grid.getCase(ligneNb, colonneNb + 1) == "") {
+									if (colonneNb - 3 >= 0) {
+										if (grid.getCase(ligneNb, colonneNb - 3) == "") {
+											valeur += POSITIVE_3;
+										}
+									}
+								}
+							}
+						} else if (countTokenRed == 2 && isMax) {
+							valeur += POSITIVE_2;
+						}
+						if (countTokenRed == 3 && !isMax) {
+							if (colonneNb + 1 <= 6) {
+								if (grid.getCase(ligneNb, colonneNb + 1) == "") {
+									valeur += NEGATIVE_3;
+								}
+							} 
+							if (colonneNb - 3 >= 0) {
+								if (grid.getCase(ligneNb, colonneNb - 3) == "") {
+									valeur += NEGATIVE_3;
+								}
+							}
+							if (colonneNb + 1 <= 6) {
+								if (grid.getCase(ligneNb, colonneNb + 1) == "") {
+									if (colonneNb - 3 >= 0) {
+										if (grid.getCase(ligneNb, colonneNb - 3) == "") {
+											valeur += NEGATIVE_3_BIS;
+										}
+									}
+								}
+							}
+						} else if (countTokenRed == 2 && !isMax) {
+							valeur += NEGATIVE_2;
+						} else if (countTokenRed == 1 && !isMax) {
+							valeur += NEGATIVE_1;
+						}
+						break;
+					}
+					default: {
 						countTokenBlue = 0;
-					}
-					if (countTokenBlue == 3 && !isMax) {
-						if (colonneNb + 1 <= 6) {
-							if (grid.getCase(ligneNb, colonneNb + 1) == "") {
-								System.out.println("hey4");
-								valeur += 200;
-							}
-						}
-						if (colonneNb - 3 >= 0) {
-							if (grid.getCase(ligneNb, colonneNb - 3) == "") {
-								System.out.println("hey5");
-
-								valeur += 200;
-							}
-						}
-						if (colonneNb + 1 <= 6) {
-							if (grid.getCase(ligneNb, colonneNb + 1) == "") {
-								if (colonneNb - 3 >= 0) {
-									if (grid.getCase(ligneNb, colonneNb - 3) == "") {
-										System.out.println("hey5");
-
-										valeur += 200;
-									}
-								}
-							}
-						}
-					} else if (countTokenBlue == 2 && !isMax) {
-						valeur += 10;
-					}
-					if (countTokenBlue == 3 && isMax) {
-						if (colonneNb + 1 <= 6) {
-							if (grid.getCase(ligneNb, colonneNb + 1) == "") {
-								System.out.println("hey1");
-								valeur -= 200;
-							}
-						}
-						if (colonneNb - 3 >= 0) {
-							if (grid.getCase(ligneNb, colonneNb - 3) == "") {
-								System.out.println("hey2");
-								valeur -= 200;
-							}
-						}
-						if (colonneNb + 1 <= 6) {
-							if (grid.getCase(ligneNb, colonneNb + 1) == "") {
-								if (colonneNb - 3 >= 0) {
-									if (grid.getCase(ligneNb, colonneNb - 3) == "") {
-										System.out.println("hey3");
-										valeur -= 500;
-									}
-								}
-							}
-						}
-					} else if (countTokenBlue == 2 && isMax) {
-						valeur -= 50;
-					} else if (countTokenBlue == 1 && isMax) {
-						valeur -= 5;
-					}
-					break;
-				}
-				case "red": {
-					countTokenRed++;
-					if (countTokenBlue > 0) {
 						countTokenRed = 0;
+						break;
 					}
-					if (countTokenRed == 3 && isMax) {
-						if (colonneNb + 1 <= 6) {
-							if (grid.getCase(ligneNb, colonneNb + 1) == "") {
-								valeur += 200;
-							}
-						}
-						if (colonneNb - 3 >= 0) {
-							if (grid.getCase(ligneNb, colonneNb - 3) == "") {
-								valeur += 200;
-							}
-						}
-						if (colonneNb + 1 <= 6) {
-							if (grid.getCase(ligneNb, colonneNb + 1) == "") {
-								if (colonneNb - 3 >= 0) {
-									if (grid.getCase(ligneNb, colonneNb - 3) == "") {
-										valeur += 200;
-									}
-								}
-							}
-						}
-					} else if (countTokenRed == 2 && isMax) {
-						valeur += 10;
 					}
-					if (countTokenRed == 3 && !isMax) {
-						if (colonneNb + 1 <= 6) {
-							if (grid.getCase(ligneNb, colonneNb + 1) == "") {
-								valeur -= 200;
-							}
-						} 
-						if (colonneNb - 3 >= 0) {
-							if (grid.getCase(ligneNb, colonneNb - 3) == "") {
-								valeur -= 200;
-							}
-						}
-						if (colonneNb + 1 <= 6) {
-							if (grid.getCase(ligneNb, colonneNb + 1) == "") {
-								if (colonneNb - 3 >= 0) {
-									if (grid.getCase(ligneNb, colonneNb - 3) == "") {
-										valeur -= 500;
-									}
-								}
-							}
-						}
-					} else if (countTokenRed == 2 && !isMax) {
-						valeur -= 50;
-					} else if (countTokenRed == 1 && !isMax) {
-						valeur -= 5;
-					}
-					break;
+					colonneNb++;
 				}
-				default: {
-					countTokenBlue = 0;
-					countTokenRed = 0;
-					break;
-				}
-				}
-				colonneNb++;
+				ligneNb++;
+				colonneNb = 0;
 			}
-			ligneNb++;
-			colonneNb = 0;
+			return valeur;
 		}
-		return valeur;
-	}
-
-	public boolean isFinished(Grid grid) {
-		if (this.checkHori(grid) || this.checkVert(grid) || this.checkSlash(grid) || this.checkAntiSlash(grid)) {
-			return true;
-		}
-		return false;
-	}
-
-	public boolean checkHori(Grid grid) {
-		int countToken1 = 0;
-		int countToken2 = 0;
-		for (String[] i : grid.getGrille()) {
-			for (String i2 : i) {
-				switch (i2) {
-				case "blue":
-					if (countToken2 > 0)
-						countToken2 = 0;
-					countToken1++;
-					if (countToken1 >= 4 || countToken2 >= 4) {
-						return true;
-					}
-					break;
-				case "red":
-					if (countToken1 > 0)
-						countToken1 = 0;
-					countToken2++;
-					if (countToken1 >= 4 || countToken2 >= 4) {
-						return true;
-					}
-					break;
-				default:
-					countToken1 = 0;
-					countToken2 = 0;
-				}
+		/**
+		 * Méthode qui sert de test de terminaison en appelant quatre méthodes correspondant aux quatres façon de 
+		 * gagner le jeu
+		 * @param grid La grille a tester
+		 * @return un boolean true si le jeu est fini, false sinon
+		 */
+		public boolean isFinished(Grid grid) {
+			if (this.checkHori(grid) || this.checkVert(grid) || this.checkSlash(grid) || this.checkAntiSlash(grid)) {
+				return true;
 			}
-			countToken1 = 0;
-			countToken2 = 0;
+			return false;
 		}
-
-		return false;
-	}
-
-	public int checkVertPourValeurUtilite(Grid grid, boolean isMax) {
-		int valeur = 0;
-		int countTokenBlue = 0;
-		int countTokenRed = 0;
-		for (int colonne = 0; colonne <= grid.getNB_COLONNE(); colonne++) {
-			for (int ligne = 0; ligne <= grid.getNB_LIGNE(); ligne++) {
-				switch (grid.getCase(ligne, colonne)) {
-				case "blue": {
-					countTokenBlue++;
-					if (countTokenRed > 0) {
-						countTokenBlue = 0;
-					}
-					if (countTokenBlue == 3 && !isMax) {
-						if (ligne - 3 >= 0) {
-							if (grid.getCase(ligne - 3, colonne) == "") {
-								valeur += 200;
-							}
-						} else {
-							valeur -= 0;
-						}
-					} else if (countTokenBlue == 2 && !isMax) {
-						valeur += 50;
-					}
-					if (countTokenBlue == 3 && isMax) {
-						if (ligne - 3 >= 0) {
-							if (grid.getCase(ligne - 3, colonne) == "") {
-								valeur -= 500;
-							}
-						} else {
-							valeur -= 0;
-						}
-					} else if (countTokenBlue == 2 && isMax) {
-						valeur -= 50;
-					} else if (countTokenBlue == 1 && isMax) {
-						valeur -= 5;
-					}
-					break;
-				}
-				case "red": {
-					countTokenRed++;
-					if (countTokenBlue > 0) {
-						countTokenRed = 0;
-					}
-					if (countTokenRed == 3 && isMax) {
-						if (ligne - 3 >= 0) {
-							if (grid.getCase(ligne - 3, colonne) == "") {
-								valeur += 200;
-							}
-						} else {
-							valeur -= 0;
-						}
-						;
-					} else if (countTokenRed == 2 && isMax) {
-						valeur += 50;
-					}
-					if (countTokenRed == 3 && !isMax) {
-						if (ligne - 3 >= 0) {
-							if (grid.getCase(ligne - 3, colonne) == "") {
-								valeur -= 500;
-							}
-						} else {
-							valeur -= 0;
-						}
-					} else if (countTokenRed == 2 && !isMax) {
-						valeur -= 50;
-					} else if (countTokenRed == 1 && !isMax) {
-						valeur -= 5;
-					}
-					break;
-				}
-				default: {
-					countTokenBlue = 0;
-					countTokenRed = 0;
-					break;
-				}
-				}
-			}
-		}
-		return valeur;
-	}
-
-	public boolean checkVert(Grid grid) {
-		int countToken1 = 0;
-		int countToken2 = 0;
-		for (int c = 0; c <= grid.getNB_COLONNE(); c++) {
-			for (int l = 0; l <= grid.getNB_LIGNE(); l++) {
-				switch (grid.getCase(l, c)) {
-				case "blue":
-					if (countToken2 > 0)
-						countToken2 = 0;
-					countToken1++;
-					if (countToken1 >= 4 || countToken2 >= 4) {
-						return true;
-					}
-					break;
-				case "red":
-					if (countToken1 > 0)
-						countToken1 = 0;
-					countToken2++;
-					if (countToken1 >= 4 || countToken2 >= 4) {
-						return true;
-					}
-					break;
-				default:
-					countToken1 = 0;
-					countToken2 = 0;
-				}
-			}
-			countToken1 = 0;
-			countToken2 = 0;
-		}
-		return false;
-	}
-
-	public boolean checkSlash(Grid grid) {
-		int countToken1 = 0;
-		int countToken2 = 0;
-		int c2, l2;
-		for (int l = 3; l <= grid.getNB_LIGNE(); l++) {
-			for (int c = 0; c <= 3; c++) {
-				switch (grid.getCase(l, c)) {
-				case "blue":
-					countToken1 = 0;
-					if (countToken2 > 0)
-						countToken2 = 0;
-					countToken1++;
-					c2 = c;
-					l2 = l;
-					for (int i = 1; i < 4; i++) {
-						c2++;
-						l2--;
-						if (grid.getCase(l2, c2) == "blue")
-							countToken1++;
-						else if (grid.getCase(l2, c2) != "red") {
-							countToken1 = 0;
-							break;
-						}
-					}
-					if (countToken1 >= 4 || countToken2 >= 4) {
-						return true;
-					}
-					break;
-				case "red":
-					countToken2 = 0;
-					if (countToken1 > 0)
-						countToken1 = 0;
-					countToken2++;
-					c2 = c;
-					l2 = l;
-					for (int i = 1; i < 4; i++) {
-						c2++;
-						l2--;
-						if (grid.getCase(l2, c2) == "red")
-							countToken2++;
-						else if (grid.getCase(l2, c2) != "blue") {
+		/**
+		 * Une des quatre fonctions test, elle permet de regarder si il y a des alignements horizontaux
+		 * @param grid La grille a tester
+		 * @return un boolean true s'il existe un alignement, false sinon
+		 */
+		public boolean checkHori(Grid grid) {
+			int countToken1 = 0;
+			int countToken2 = 0;
+			for (String[] i : grid.getGrille()) {
+				for (String i2 : i) {
+					switch (i2) {
+					case "blue":
+						if (countToken2 > 0)
 							countToken2 = 0;
-							break;
+						countToken1++;
+						if (countToken1 >= 4 || countToken2 >= 4) {
+							return true;
 						}
-					}
-					if (countToken1 >= 4 || countToken2 >= 4) {
-						return true;
-					}
-					break;
-				default:
-					countToken1 = 0;
-					countToken2 = 0;
-				}
-			}
-			countToken1 = 0;
-			countToken2 = 0;
-		}
-		return false;
-	}
-
-	public int checkSlashPourValeurUtilite(Grid grid, boolean isMax) {
-		int valeur = 0;
-		int countTokenBlue = 0;
-		int countTokenRed = 0;
-		int ligne2, colonne2;
-		for (int ligne = 3; ligne <= grid.getNB_LIGNE(); ligne++) {
-			for (int colonne = 0; colonne <= 3; colonne++) {
-				switch (grid.getCase(ligne, colonne)) {
-				case "blue": {
-					countTokenBlue = 1;
-					if (countTokenRed > 0) {
-						countTokenRed = 0;
-					}
-					ligne2 = ligne;
-					colonne2 = colonne;
-					for (int k = 1; k < 4; k++) {
-						ligne2--;
-						colonne2++;
-						if (grid.getCase(ligne2, colonne2) == "blue") {
-							countTokenBlue++;
-							if (countTokenBlue == 3 && !isMax) {
-								valeur += 200;
-							} else if (countTokenBlue == 2 && !isMax) {
-								valeur += 50;
-							}
-							if (countTokenBlue == 3 && isMax) {
-								valeur -= 500;
-							} else if (countTokenBlue == 2 && isMax) {
-								valeur -= 50;
-							} else if (countTokenBlue == 1 && isMax) {
-								valeur -= 5;
-							}
-						} else if (grid.getCase(ligne2, colonne2) == "red") {
-							countTokenBlue = 0;
-						}
-					}
-					break;
-				}
-				case "red": {
-					countTokenRed = 1;
-					if (countTokenBlue > 0) {
-						countTokenBlue = 0;
-					}
-					ligne2 = ligne;
-					colonne2 = colonne;
-					for (int k = 1; k < 4; k++) {
-						ligne2--;
-						colonne2++;
-						if (grid.getCase(ligne2, colonne2) == "blue") {
-							countTokenRed++;
-							if (countTokenRed == 3 && isMax) {
-								valeur += 200;
-							} else if (countTokenRed == 2 && isMax) {
-								valeur += 50;
-							}
-							if (countTokenRed == 3 && !isMax) {
-								valeur -= 500;
-							} else if (countTokenRed == 2 && !isMax) {
-								valeur -= 50;
-							} else if (countTokenRed == 1 && !isMax) {
-								valeur -= 5;
-							}
-						} else if (grid.getCase(ligne2, colonne2) == "red") {
-							countTokenBlue = 0;
-						}
-					}
-					break;
-				}
-				default: {
-					countTokenBlue = 0;
-					countTokenRed = 0;
-				}
-				}
-
-			}
-			countTokenBlue = 0;
-			countTokenRed = 0;
-		}
-		return valeur;
-	}
-
-	public int checkAntiSlashPourValeurUtilite(Grid grid, boolean isMax) {
-		int valeur = 0;
-		int countTokenBlue = 0;
-		int countTokenRed = 0;
-		int ligne2, colonne2;
-		for (int ligne = 3; ligne <= grid.getNB_LIGNE(); ligne++) {
-			for (int colonne = 3; colonne <= grid.getNB_COLONNE(); colonne++) {
-				switch (grid.getCase(ligne, colonne)) {
-				case "blue": {
-					countTokenBlue = 1;
-					if (countTokenRed > 0) {
-						countTokenRed = 0;
-					}
-					ligne2 = ligne;
-					colonne2 = colonne;
-					for (int k = 1; k < 4; k++) {
-						ligne2--;
-						colonne2--;
-						if (grid.getCase(ligne2, colonne2) == "blue") {
-							countTokenBlue++;
-							if (countTokenRed == 3 && isMax) {
-								valeur += 200;
-							} else if (countTokenRed == 2 && isMax) {
-								valeur += 50;
-							}
-							if (countTokenRed == 3 && !isMax) {
-								valeur -= 500;
-							} else if (countTokenRed == 2 && !isMax) {
-								valeur -= 50;
-							} else if (countTokenRed == 1 && !isMax) {
-								valeur -= 5;
-							}
-						} else if (grid.getCase(ligne2, colonne2) == "red") {
-							countTokenBlue = 0;
-						}
-					}
-					break;
-				}
-				case "red": {
-					countTokenRed = 1;
-					if (countTokenBlue > 0) {
-						countTokenBlue = 0;
-					}
-					ligne2 = ligne;
-					colonne2 = colonne;
-					for (int k = 1; k < 4; k++) {
-						ligne2--;
-						colonne2--;
-						if (grid.getCase(ligne2, colonne2) == "blue") {
-							countTokenRed++;
-							if (countTokenRed == 3 && isMax) {
-								valeur += 200;
-							} else if (countTokenRed == 2 && isMax) {
-								valeur += 50;
-							}
-							if (countTokenRed == 3 && !isMax) {
-								valeur -= 500;
-							} else if (countTokenRed == 2 && !isMax) {
-								valeur -= 50;
-							} else if (countTokenRed == 1 && !isMax) {
-								valeur -= 5;
-							}
-						} else if (grid.getCase(ligne2, colonne2) == "red") {
-							countTokenBlue = 0;
-						}
-					}
-					break;
-				}
-				default: {
-					countTokenBlue = 0;
-					countTokenRed = 0;
-				}
-				}
-
-			}
-			countTokenBlue = 0;
-			countTokenRed = 0;
-		}
-		return valeur;
-	}
-
-	public boolean checkAntiSlash(Grid grid) {
-		int countToken1 = 0;
-		int countToken2 = 0;
-		int c2, l2;
-		for (int l = 3; l <= grid.getNB_LIGNE(); l++) {
-			for (int c = 3; c <= grid.getNB_COLONNE(); c++) {
-				switch (grid.getCase(l, c)) {
-				case "blue":
-					countToken1 = 0;
-					if (countToken2 > 0)
-						countToken2 = 0;
-					countToken1++;
-					c2 = c;
-					l2 = l;
-					for (int i = 1; i < 4; i++) {
-						c2--;
-						l2--;
-						if (grid.getCase(l2, c2) == "blue")
-							countToken1++;
-						else if (grid.getCase(l2, c2) != "blue") {
+						break;
+					case "red":
+						if (countToken1 > 0)
 							countToken1 = 0;
-							break;
+						countToken2++;
+						if (countToken1 >= 4 || countToken2 >= 4) {
+							return true;
 						}
-					}
-					if (countToken1 >= 4 || countToken2 >= 4) {
-						return true;
-					}
-					break;
-				case "red":
-					countToken2 = 0;
-					if (countToken1 > 0)
+						break;
+					default:
 						countToken1 = 0;
-					countToken2++;
-					c2 = c;
-					l2 = l;
-					for (int i = 1; i < 4; i++) {
-						c2--;
-						l2--;
-						if (grid.getCase(l2, c2) == "red")
-							countToken2++;
-						else if (grid.getCase(l2, c2) != "red") {
-							countToken2 = 0;
-							break;
+						countToken2 = 0;
+					}
+				}
+				countToken1 = 0;
+				countToken2 = 0;
+			}
+
+			return false;
+		}
+		/**
+		 * Méthode qui permet de calculer la valeur d'utilité d'une grille en comptant les alignements verticaux 
+		 * des jetons
+		 * @param grid Grille a analyser
+		 * @param isMax Boolean pour savoir si l'appelant est max ou pas
+		 * @return Une valeur entiere correspondant a la valeur d'utilité verticale pour l'appelant
+		 */
+		public int checkVertPourValeurUtilite(Grid grid, boolean isMax) {
+			int valeur = 0;
+			int countTokenBlue = 0;
+			int countTokenRed = 0;
+			for (int colonne = 0; colonne <= grid.getNB_COLONNE(); colonne++) {
+				for (int ligne = 0; ligne <= grid.getNB_LIGNE(); ligne++) {
+					switch (grid.getCase(ligne, colonne)) {
+					case "blue": {
+						countTokenBlue++;
+						if (countTokenRed > 0) {
+							countTokenBlue = 0;
 						}
+						if (countTokenBlue == 3 && !isMax) {
+							if (ligne - 3 >= 0) {
+								if (grid.getCase(ligne - 3, colonne) == "") {
+									valeur += POSITIVE_3;
+								}
+							} else {
+								valeur -= 0;
+							}
+						} else if (countTokenBlue == 2 && !isMax) {
+							valeur += 50;
+						}
+						if (countTokenBlue == 3 && isMax) {
+							if (ligne - 3 >= 0) {
+								if (grid.getCase(ligne - 3, colonne) == "") {
+									valeur += NEGATIVE_3_BIS;
+								}
+							} else {
+								valeur -= 0;
+							}
+						} else if (countTokenBlue == 2 && isMax) {
+							valeur += NEGATIVE_2;
+						} else if (countTokenBlue == 1 && isMax) {
+							valeur += NEGATIVE_1;
+						}
+						break;
 					}
-					if (countToken1 >= 4 || countToken2 >= 4) {
-						return true;
+					case "red": {
+						countTokenRed++;
+						if (countTokenBlue > 0) {
+							countTokenRed = 0;
+						}
+						if (countTokenRed == 3 && isMax) {
+							if (ligne - 3 >= 0) {
+								if (grid.getCase(ligne - 3, colonne) == "") {
+									valeur += POSITIVE_3;
+								}
+							} else {
+								valeur -= 0;
+							}
+							;
+						} else if (countTokenRed == 2 && isMax) {
+							valeur += 50;
+						}
+						if (countTokenRed == 3 && !isMax) {
+							if (ligne - 3 >= 0) {
+								if (grid.getCase(ligne - 3, colonne) == "") {
+									valeur += NEGATIVE_3_BIS;
+								}
+							} else {
+								valeur -= 0;
+							}
+						} else if (countTokenRed == 2 && !isMax) {
+							valeur += NEGATIVE_2;
+						} else if (countTokenRed == 1 && !isMax) {
+							valeur += NEGATIVE_1;
+						}
+						break;
 					}
-					break;
-				default:
-					countToken1 = 0;
-					countToken2 = 0;
+					default: {
+						countTokenBlue = 0;
+						countTokenRed = 0;
+						break;
+					}
+					}
 				}
 			}
-			countToken1 = 0;
-			countToken2 = 0;
+			return valeur;
 		}
-		return false;
-	}
+		/**
+		 * Une des quatre fonctions test, elle permet de regarder si il y a des alignements verticaux
+		 * @param grid La grille a tester
+		 * @return un boolean true s'il existe un alignement, false sinon
+		 */
+		public boolean checkVert(Grid grid) {
+			int countToken1 = 0;
+			int countToken2 = 0;
+			for (int c = 0; c <= grid.getNB_COLONNE(); c++) {
+				for (int l = 0; l <= grid.getNB_LIGNE(); l++) {
+					switch (grid.getCase(l, c)) {
+					case "blue":
+						if (countToken2 > 0)
+							countToken2 = 0;
+						countToken1++;
+						if (countToken1 >= 4 || countToken2 >= 4) {
+							return true;
+						}
+						break;
+					case "red":
+						if (countToken1 > 0)
+							countToken1 = 0;
+						countToken2++;
+						if (countToken1 >= 4 || countToken2 >= 4) {
+							return true;
+						}
+						break;
+					default:
+						countToken1 = 0;
+						countToken2 = 0;
+					}
+				}
+				countToken1 = 0;
+				countToken2 = 0;
+			}
+			return false;
+		}
+		/**
+		 * Une des quatre fonctions test, elle permet de regarder si il y a des alignements dans la direction "slash"
+		 * @param grid La grille a tester
+		 * @return un boolean true s'il existe un alignement, false sinon
+		 */
+		public boolean checkSlash(Grid grid) {
+			int countToken1 = 0;
+			int countToken2 = 0;
+			int c2, l2;
+			for (int l = 3; l <= grid.getNB_LIGNE(); l++) {
+				for (int c = 0; c <= 3; c++) {
+					switch (grid.getCase(l, c)) {
+					case "blue":
+						countToken1 = 0;
+						if (countToken2 > 0)
+							countToken2 = 0;
+						countToken1++;
+						c2 = c;
+						l2 = l;
+						for (int i = 1; i < 4; i++) {
+							c2++;
+							l2--;
+							if (grid.getCase(l2, c2) == "blue")
+								countToken1++;
+							else if (grid.getCase(l2, c2) != "red") {
+								countToken1 = 0;
+								break;
+							}
+						}
+						if (countToken1 >= 4 || countToken2 >= 4) {
+							return true;
+						}
+						break;
+					case "red":
+						countToken2 = 0;
+						if (countToken1 > 0)
+							countToken1 = 0;
+						countToken2++;
+						c2 = c;
+						l2 = l;
+						for (int i = 1; i < 4; i++) {
+							c2++;
+							l2--;
+							if (grid.getCase(l2, c2) == "red")
+								countToken2++;
+							else if (grid.getCase(l2, c2) != "blue") {
+								countToken2 = 0;
+								break;
+							}
+						}
+						if (countToken1 >= 4 || countToken2 >= 4) {
+							return true;
+						}
+						break;
+					default:
+						countToken1 = 0;
+						countToken2 = 0;
+					}
+				}
+				countToken1 = 0;
+				countToken2 = 0;
+			}
+			return false;
+		}
+		/**
+		 * Méthode qui permet de calculer la valeur d'utilité d'une grille en comptant les alignements dans la
+		 * direction "slash" des jetons
+		 * @param grid Grille a analyser
+		 * @param isMax Boolean pour savoir si l'appelant est max ou pas
+		 * @return Une valeur entiere correspondant a la valeur d'utilité des alignements
+		 * en "slash" pour l'appelant
+		 */
+		public int checkSlashPourValeurUtilite(Grid grid, boolean isMax) {
+			int valeur = 0;
+			int countTokenBlue = 0;
+			int countTokenRed = 0;
+			int ligne2, colonne2;
+			for (int ligne = 3; ligne <= grid.getNB_LIGNE(); ligne++) {
+				for (int colonne = 0; colonne <= 3; colonne++) {
+					switch (grid.getCase(ligne, colonne)) {
+					case "blue": {
+						countTokenBlue = 1;
+						if (countTokenRed > 0) {
+							countTokenRed = 0;
+						}
+						ligne2 = ligne;
+						colonne2 = colonne;
+						for (int k = 1; k < 4; k++) {
+							ligne2--;
+							colonne2++;
+							if (grid.getCase(ligne2, colonne2) == "blue") {
+								countTokenBlue++;
+								if (countTokenBlue == 3 && !isMax) {
+									valeur += POSITIVE_3;
+								} else if (countTokenBlue == 2 && !isMax) {
+									valeur += 50;
+								}
+								if (countTokenBlue == 3 && isMax) {
+									valeur += NEGATIVE_3_BIS;
+								} else if (countTokenBlue == 2 && isMax) {
+									valeur += NEGATIVE_2;
+								} else if (countTokenBlue == 1 && isMax) {
+									valeur += NEGATIVE_1;
+								}
+							} else if (grid.getCase(ligne2, colonne2) == "red") {
+								countTokenBlue = 0;
+							}
+						}
+						break;
+					}
+					case "red": {
+						countTokenRed = 1;
+						if (countTokenBlue > 0) {
+							countTokenBlue = 0;
+						}
+						ligne2 = ligne;
+						colonne2 = colonne;
+						for (int k = 1; k < 4; k++) {
+							ligne2--;
+							colonne2++;
+							if (grid.getCase(ligne2, colonne2) == "blue") {
+								countTokenRed++;
+								if (countTokenRed == 3 && isMax) {
+									valeur += POSITIVE_3;
+								} else if (countTokenRed == 2 && isMax) {
+									valeur += 50;
+								}
+								if (countTokenRed == 3 && !isMax) {
+									valeur += NEGATIVE_3_BIS;
+								} else if (countTokenRed == 2 && !isMax) {
+									valeur += NEGATIVE_2;
+								} else if (countTokenRed == 1 && !isMax) {
+									valeur += NEGATIVE_1;
+								}
+							} else if (grid.getCase(ligne2, colonne2) == "red") {
+								countTokenBlue = 0;
+							}
+						}
+						break;
+					}
+					default: {
+						countTokenBlue = 0;
+						countTokenRed = 0;
+					}
+					}
 
-	public int heuristique2AlignementsGagnants(Grid grid, boolean isMax) {
-		int heurs = 0;
-		int nombreDeJetonsDansTableau=grid.nombreJetonDansTableau();
-		int facteur=(nombreDeJetonsDansTableau==0?20:20/nombreDeJetonsDansTableau);
-		for (int l = 0; l < 6; l++) {
-			for (int c = 0; c < 7; c++) {
-				if (grid.getCase(l, c).equals("blue") && isMax) {
-					heurs -=  facteur*this.grilleHeuristique[l][c];
-				} else if (grid.getCase(l, c).equals("red") && isMax) {
-					heurs += facteur * this.grilleHeuristique[l][c];
-				} else if (grid.getCase(l, c).equals("blue") && !isMax) {
-					heurs += facteur * this.grilleHeuristique[l][c];
-				} else if (grid.getCase(l, c).equals("red") && !isMax) {
-					heurs -= facteur * this.grilleHeuristique[l][c];
+				}
+				countTokenBlue = 0;
+				countTokenRed = 0;
+			}
+			return valeur;
+		}
+		/**
+		 * Méthode qui permet de calculer la valeur d'utilité d'une grille en comptant les alignements dans la
+		 * direction "anti-slash" des jetons
+		 * @param grid Grille a analyser
+		 * @param isMax Boolean pour savoir si l'appelant est max ou pas
+		 * @return Une valeur entiere correspondant a la valeur d'utilité des alignements
+		 * en "anti-slash" pour l'appelant
+		 */
+		public int checkAntiSlashPourValeurUtilite(Grid grid, boolean isMax) {
+			int valeur = 0;
+			int countTokenBlue = 0;
+			int countTokenRed = 0;
+			int ligne2, colonne2;
+			for (int ligne = 3; ligne <= grid.getNB_LIGNE(); ligne++) {
+				for (int colonne = 3; colonne <= grid.getNB_COLONNE(); colonne++) {
+					switch (grid.getCase(ligne, colonne)) {
+					case "blue": {
+						countTokenBlue = 1;
+						if (countTokenRed > 0) {
+							countTokenRed = 0;
+						}
+						ligne2 = ligne;
+						colonne2 = colonne;
+						for (int k = 1; k < 4; k++) {
+							ligne2--;
+							colonne2--;
+							if (grid.getCase(ligne2, colonne2) == "blue") {
+								countTokenBlue++;
+								if (countTokenRed == 3 && isMax) {
+									valeur += POSITIVE_3;
+								} else if (countTokenRed == 2 && isMax) {
+									valeur += 50;
+								}
+								if (countTokenRed == 3 && !isMax) {
+									valeur += NEGATIVE_3_BIS;
+								} else if (countTokenRed == 2 && !isMax) {
+									valeur += NEGATIVE_2;
+								} else if (countTokenRed == 1 && !isMax) {
+									valeur += NEGATIVE_1;
+								}
+							} else if (grid.getCase(ligne2, colonne2) == "red") {
+								countTokenBlue = 0;
+							}
+						}
+						break;
+					}
+					case "red": {
+						countTokenRed = 1;
+						if (countTokenBlue > 0) {
+							countTokenBlue = 0;
+						}
+						ligne2 = ligne;
+						colonne2 = colonne;
+						for (int k = 1; k < 4; k++) {
+							ligne2--;
+							colonne2--;
+							if (grid.getCase(ligne2, colonne2) == "blue") {
+								countTokenRed++;
+								if (countTokenRed == 3 && isMax) {
+									valeur += POSITIVE_3;
+								} else if (countTokenRed == 2 && isMax) {
+									valeur += 50;
+								}
+								if (countTokenRed == 3 && !isMax) {
+									valeur += NEGATIVE_3_BIS;
+								} else if (countTokenRed == 2 && !isMax) {
+									valeur += NEGATIVE_2;
+								} else if (countTokenRed == 1 && !isMax) {
+									valeur += NEGATIVE_1;
+								}
+							} else if (grid.getCase(ligne2, colonne2) == "red") {
+								countTokenBlue = 0;
+							}
+						}
+						break;
+					}
+					default: {
+						countTokenBlue = 0;
+						countTokenRed = 0;
+					}
+					}
+
+				}
+				countTokenBlue = 0;
+				countTokenRed = 0;
+			}
+			return valeur;
+		}
+		
+		/**
+		 * Une des quatre fonctions test, elle permet de regarder si il y a des alignements dans la direction "anti-slash"
+		 * @param grid La grille a tester
+		 * @return un boolean true s'il existe un alignement, false sinon
+		 */
+		public boolean checkAntiSlash(Grid grid) {
+			int countToken1 = 0;
+			int countToken2 = 0;
+			int c2, l2;
+			for (int l = 3; l <= grid.getNB_LIGNE(); l++) {
+				for (int c = 3; c <= grid.getNB_COLONNE(); c++) {
+					switch (grid.getCase(l, c)) {
+					case "blue":
+						countToken1 = 0;
+						if (countToken2 > 0)
+							countToken2 = 0;
+						countToken1++;
+						c2 = c;
+						l2 = l;
+						for (int i = 1; i < 4; i++) {
+							c2--;
+							l2--;
+							if (grid.getCase(l2, c2) == "blue")
+								countToken1++;
+							else if (grid.getCase(l2, c2) != "blue") {
+								countToken1 = 0;
+								break;
+							}
+						}
+						if (countToken1 >= 4 || countToken2 >= 4) {
+							return true;
+						}
+						break;
+					case "red":
+						countToken2 = 0;
+						if (countToken1 > 0)
+							countToken1 = 0;
+						countToken2++;
+						c2 = c;
+						l2 = l;
+						for (int i = 1; i < 4; i++) {
+							c2--;
+							l2--;
+							if (grid.getCase(l2, c2) == "red")
+								countToken2++;
+							else if (grid.getCase(l2, c2) != "red") {
+								countToken2 = 0;
+								break;
+							}
+						}
+						if (countToken1 >= 4 || countToken2 >= 4) {
+							return true;
+						}
+						break;
+					default:
+						countToken1 = 0;
+						countToken2 = 0;
+					}
+				}
+				countToken1 = 0;
+				countToken2 = 0;
+			}
+			return false;
+		}
+
+		/**
+		 * Méthode qui retourne une heuristique basée sur les positions des jetons
+		 * @param grid Grille sur laquelle la méthode va calculer l'heuristique
+		 * @param isMax Boolean qui permet de savoir si c'est le tour de max ou non
+		 * @return Une heuristique basée sur le placement des jetons du joueur. Les points sont basés sur le nombre d'
+		 * alignement possible a ce point. La valeur de cet heuristique diminue au fur et a mesure qu'on avance
+		 * dans le jeu.
+		 */
+		public int heuristique2AlignementsGagnants(Grid grid, boolean isMax) {
+			int heurs = 0;
+			int nombreDeJetonsDansTableau=grid.nombreJetonDansTableau();
+			int facteur=(nombreDeJetonsDansTableau==0?18:18/nombreDeJetonsDansTableau);
+			for (int l = 0; l < 6; l++) {
+				for (int c = 0; c < 7; c++) {
+					if (grid.getCase(l, c).equals("blue") && isMax) {
+						heurs -=  facteur*this.grilleHeuristique[l][c];
+					} else if (grid.getCase(l, c).equals("red") && isMax) {
+						heurs += facteur * this.grilleHeuristique[l][c];
+					} else if (grid.getCase(l, c).equals("blue") && !isMax) {
+						heurs += facteur * this.grilleHeuristique[l][c];
+					} else if (grid.getCase(l, c).equals("red") && !isMax) {
+						heurs -= facteur * this.grilleHeuristique[l][c];
+					}
 				}
 			}
+			return heurs;
 		}
-		return heurs;
-	}
-
-	public Etat getEtatParent() {
-		return this.etatParent;
-	}
+		/**
+		 * 
+		 * @return L'état parent du tour en cours
+		 */
+		public Etat getEtatParent() {
+			return this.etatParent;
+		}
 }

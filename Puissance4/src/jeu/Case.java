@@ -2,10 +2,16 @@ package jeu;
 
 import javafx.scene.image.ImageView;
 
+/**
+ * Classe permettant de représenter une case de la grille de jeu
+ * Afin de l'afficher dans l'interface graphique
+ * @author davidpinaud
+ *
+ */
 public class Case {
-	ImageView imageView;
-	int x,y;
-	boolean isEmpty;
+	ImageView imageView; //image a afficher dans l'interface graphique
+	int x,y; // coordonnées de la case
+	boolean isEmpty; // Si la case est vide (donc imageView est une image blanche)
 	
 	
 	public Case(ImageView imageView, int x, int y) {

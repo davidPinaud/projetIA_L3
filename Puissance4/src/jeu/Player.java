@@ -5,6 +5,12 @@ public class Player {
 	private String token;//either red or blue
 	private int id;
 	
+	/**
+	 * Initialisation d'un joueur
+	 * @param token Le jeton qu'il va utiliser, soit un String "blue", soit un String "red"
+	 * @param id
+	 * @throws Exception
+	 */
 	public Player(String token,int id) throws Exception {
 		if(equalsToken(token)) {
 			this.token=token;
@@ -16,7 +22,11 @@ public class Player {
 		this.id=id;
 	}
 	
-	
+	/**
+	 * Test pour savoir si le joueur donné en parametre en est fait le joueur courant
+	 * @param player Le joueur a tester
+	 * @return un boolean
+	 */
 	public boolean equalsPlayer(Player player) {
 		return this.id==player.getID()?true:false;
 	}
@@ -26,7 +36,7 @@ public class Player {
 	}
 	
 	/**
-	 * Méthode qui test si l'attribut token est bien x ou o 
+	 * Méthode qui test si l'attribut token est bien blue ou red
 	 * @param token
 	 * @return boolan
 	 */

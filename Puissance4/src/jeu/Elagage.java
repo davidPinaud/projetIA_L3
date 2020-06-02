@@ -2,7 +2,11 @@ package jeu;
 
 import java.util.List;
 import java.util.Vector;
-
+/**
+ * classe permettant de calculer le coup suivant d'une IA basée sur l'algorithme d'élagage alpha-beta
+ * @author davidpinaud
+ *
+ */
 public class Elagage { //alpha beta
 	private Game game;
 	private Etat etatParent;
@@ -121,7 +125,14 @@ public class Elagage { //alpha beta
 			return v;
 		}
 	}
-
+	
+	/**
+	 * Méthode qui permet de donner une valeur d'utilité à l'état analysé en
+	 * appellant les deux heurisitique implémentées
+	 * @param etat L'état a analyser
+	 * @param isMax Boolean pour savoir si l'appelant est max
+	 * @return Un entier correspondant à la valeur d'utilité de l'état
+	 */
 	public int valeurDutilite(Etat etat, boolean isMax) {
 		if (this.isFinished(etat.getGrid())) {
 			etat.setUtilite(isMax ? -2147483648 : 2147483647);
@@ -148,6 +159,21 @@ public class Elagage { //alpha beta
 		return valeurUtilite;
 	}
 
+	//Constante déterminant la premiere heuristique
+	final static int POSITIVE_3=200;
+	final static int NEGATIVE_3=-350;
+	final static int NEGATIVE_3_BIS=-600;
+	final static int POSITIVE_2=10;
+	final static int NEGATIVE_2=-50;
+	final static int NEGATIVE_1=-5;
+	
+	/**
+	 * Méthode qui permet de calculer la valeur d'utilité d'une grille en comptant les alignements horizontaux 
+	 * des jetons
+	 * @param grid Grille a analyser
+	 * @param isMax Boolean pour savoir si l'appelant est max ou pas
+	 * @return Une valeur entiere correspondant a la valeur d'utilité horizontale pour l'appelant
+	 */
 	public int checkHoriPourValeurUtilite(Grid grid, boolean isMax) {
 		int valeur = 0;
 		int countTokenBlue = 0;
@@ -161,61 +187,61 @@ public class Elagage { //alpha beta
 					if (countTokenRed > 0) {
 						countTokenBlue = 0;
 					}
-					if (countTokenBlue == 3 && !isMax) {
-						if (colonneNb + 1 <= 6) {
-							if (grid.getCase(ligneNb, colonneNb + 1) == "") {
-								System.out.println("hey4");
-								valeur += 200;
+					if (countTokenBlue == 3 && !isMax) {//Si il y a trois jetons alignés horizontalement
+						if (colonneNb + 1 <= 6) { //Si la prochaine case existe
+							if (grid.getCase(ligneNb, colonneNb + 1) == "") { //si la prochaine case est vide
+								//System.out.println("hey4");
+								valeur += POSITIVE_3;
 							}
 						}
-						if (colonneNb - 3 >= 0) {
-							if (grid.getCase(ligneNb, colonneNb - 3) == "") {
-								System.out.println("hey5");
+						if (colonneNb - 3 >= 0) {//si la case d'avant les jetons existe
+							if (grid.getCase(ligneNb, colonneNb - 3) == "") {//si elle est vide
+								//System.out.println("hey5");
 
-								valeur += 200;
+								valeur += POSITIVE_3;
 							}
 						}
-						if (colonneNb + 1 <= 6) {
+						if (colonneNb + 1 <= 6) {//si les deux existent et sont vides
 							if (grid.getCase(ligneNb, colonneNb + 1) == "") {
 								if (colonneNb - 3 >= 0) {
 									if (grid.getCase(ligneNb, colonneNb - 3) == "") {
-										System.out.println("hey5");
+									//	System.out.println("hey5");
 
-										valeur += 200;
+										valeur += POSITIVE_3;
 									}
 								}
 							}
 						}
 					} else if (countTokenBlue == 2 && !isMax) {
-						valeur += 10;
+						valeur += POSITIVE_2;
 					}
 					if (countTokenBlue == 3 && isMax) {
 						if (colonneNb + 1 <= 6) {
 							if (grid.getCase(ligneNb, colonneNb + 1) == "") {
-								System.out.println("hey1");
-								valeur -= 200;
+								//System.out.println("hey1");
+								valeur += NEGATIVE_3;
 							}
 						}
 						if (colonneNb - 3 >= 0) {
 							if (grid.getCase(ligneNb, colonneNb - 3) == "") {
-								System.out.println("hey2");
-								valeur -= 200;
+								//System.out.println("hey2");
+								valeur += NEGATIVE_3;
 							}
 						}
-						if (colonneNb + 1 <= 6) {
+						if (colonneNb + 1 <= 6) { // si bleu est en passe de gagner
 							if (grid.getCase(ligneNb, colonneNb + 1) == "") {
 								if (colonneNb - 3 >= 0) {
 									if (grid.getCase(ligneNb, colonneNb - 3) == "") {
-										System.out.println("hey3");
-										valeur -= 500;
+										//System.out.println("hey3");
+										valeur += NEGATIVE_3_BIS;
 									}
 								}
 							}
 						}
 					} else if (countTokenBlue == 2 && isMax) {
-						valeur -= 50;
+						valeur += NEGATIVE_2;
 					} else if (countTokenBlue == 1 && isMax) {
-						valeur -= 5;
+						valeur += NEGATIVE_1;
 					}
 					break;
 				}
@@ -227,50 +253,50 @@ public class Elagage { //alpha beta
 					if (countTokenRed == 3 && isMax) {
 						if (colonneNb + 1 <= 6) {
 							if (grid.getCase(ligneNb, colonneNb + 1) == "") {
-								valeur += 200;
+								valeur += POSITIVE_3;
 							}
 						}
 						if (colonneNb - 3 >= 0) {
 							if (grid.getCase(ligneNb, colonneNb - 3) == "") {
-								valeur += 200;
+								valeur += POSITIVE_3;
 							}
 						}
 						if (colonneNb + 1 <= 6) {
 							if (grid.getCase(ligneNb, colonneNb + 1) == "") {
 								if (colonneNb - 3 >= 0) {
 									if (grid.getCase(ligneNb, colonneNb - 3) == "") {
-										valeur += 200;
+										valeur += POSITIVE_3;
 									}
 								}
 							}
 						}
 					} else if (countTokenRed == 2 && isMax) {
-						valeur += 10;
+						valeur += POSITIVE_2;
 					}
 					if (countTokenRed == 3 && !isMax) {
 						if (colonneNb + 1 <= 6) {
 							if (grid.getCase(ligneNb, colonneNb + 1) == "") {
-								valeur -= 200;
+								valeur += NEGATIVE_3;
 							}
 						} 
 						if (colonneNb - 3 >= 0) {
 							if (grid.getCase(ligneNb, colonneNb - 3) == "") {
-								valeur -= 200;
+								valeur += NEGATIVE_3;
 							}
 						}
 						if (colonneNb + 1 <= 6) {
 							if (grid.getCase(ligneNb, colonneNb + 1) == "") {
 								if (colonneNb - 3 >= 0) {
 									if (grid.getCase(ligneNb, colonneNb - 3) == "") {
-										valeur -= 500;
+										valeur += NEGATIVE_3_BIS;
 									}
 								}
 							}
 						}
 					} else if (countTokenRed == 2 && !isMax) {
-						valeur -= 50;
+						valeur += NEGATIVE_2;
 					} else if (countTokenRed == 1 && !isMax) {
-						valeur -= 5;
+						valeur += NEGATIVE_1;
 					}
 					break;
 				}
@@ -287,14 +313,23 @@ public class Elagage { //alpha beta
 		}
 		return valeur;
 	}
-
+	/**
+	 * Méthode qui sert de test de terminaison en appelant quatre méthodes correspondant aux quatres façon de 
+	 * gagner le jeu
+	 * @param grid La grille a tester
+	 * @return un boolean true si le jeu est fini, false sinon
+	 */
 	public boolean isFinished(Grid grid) {
 		if (this.checkHori(grid) || this.checkVert(grid) || this.checkSlash(grid) || this.checkAntiSlash(grid)) {
 			return true;
 		}
 		return false;
 	}
-
+	/**
+	 * Une des quatre fonctions test, elle permet de regarder si il y a des alignements horizontaux
+	 * @param grid La grille a tester
+	 * @return un boolean true s'il existe un alignement, false sinon
+	 */
 	public boolean checkHori(Grid grid) {
 		int countToken1 = 0;
 		int countToken2 = 0;
@@ -328,7 +363,13 @@ public class Elagage { //alpha beta
 
 		return false;
 	}
-
+	/**
+	 * Méthode qui permet de calculer la valeur d'utilité d'une grille en comptant les alignements verticaux 
+	 * des jetons
+	 * @param grid Grille a analyser
+	 * @param isMax Boolean pour savoir si l'appelant est max ou pas
+	 * @return Une valeur entiere correspondant a la valeur d'utilité verticale pour l'appelant
+	 */
 	public int checkVertPourValeurUtilite(Grid grid, boolean isMax) {
 		int valeur = 0;
 		int countTokenBlue = 0;
@@ -344,7 +385,7 @@ public class Elagage { //alpha beta
 					if (countTokenBlue == 3 && !isMax) {
 						if (ligne - 3 >= 0) {
 							if (grid.getCase(ligne - 3, colonne) == "") {
-								valeur += 200;
+								valeur += POSITIVE_3;
 							}
 						} else {
 							valeur -= 0;
@@ -355,15 +396,15 @@ public class Elagage { //alpha beta
 					if (countTokenBlue == 3 && isMax) {
 						if (ligne - 3 >= 0) {
 							if (grid.getCase(ligne - 3, colonne) == "") {
-								valeur -= 500;
+								valeur += NEGATIVE_3_BIS;
 							}
 						} else {
 							valeur -= 0;
 						}
 					} else if (countTokenBlue == 2 && isMax) {
-						valeur -= 50;
+						valeur += NEGATIVE_2;
 					} else if (countTokenBlue == 1 && isMax) {
-						valeur -= 5;
+						valeur += NEGATIVE_1;
 					}
 					break;
 				}
@@ -375,7 +416,7 @@ public class Elagage { //alpha beta
 					if (countTokenRed == 3 && isMax) {
 						if (ligne - 3 >= 0) {
 							if (grid.getCase(ligne - 3, colonne) == "") {
-								valeur += 200;
+								valeur += POSITIVE_3;
 							}
 						} else {
 							valeur -= 0;
@@ -387,15 +428,15 @@ public class Elagage { //alpha beta
 					if (countTokenRed == 3 && !isMax) {
 						if (ligne - 3 >= 0) {
 							if (grid.getCase(ligne - 3, colonne) == "") {
-								valeur -= 500;
+								valeur += NEGATIVE_3_BIS;
 							}
 						} else {
 							valeur -= 0;
 						}
 					} else if (countTokenRed == 2 && !isMax) {
-						valeur -= 50;
+						valeur += NEGATIVE_2;
 					} else if (countTokenRed == 1 && !isMax) {
-						valeur -= 5;
+						valeur += NEGATIVE_1;
 					}
 					break;
 				}
@@ -409,7 +450,11 @@ public class Elagage { //alpha beta
 		}
 		return valeur;
 	}
-
+	/**
+	 * Une des quatre fonctions test, elle permet de regarder si il y a des alignements verticaux
+	 * @param grid La grille a tester
+	 * @return un boolean true s'il existe un alignement, false sinon
+	 */
 	public boolean checkVert(Grid grid) {
 		int countToken1 = 0;
 		int countToken2 = 0;
@@ -442,7 +487,11 @@ public class Elagage { //alpha beta
 		}
 		return false;
 	}
-
+	/**
+	 * Une des quatre fonctions test, elle permet de regarder si il y a des alignements dans la direction "slash"
+	 * @param grid La grille a tester
+	 * @return un boolean true s'il existe un alignement, false sinon
+	 */
 	public boolean checkSlash(Grid grid) {
 		int countToken1 = 0;
 		int countToken2 = 0;
@@ -502,7 +551,14 @@ public class Elagage { //alpha beta
 		}
 		return false;
 	}
-
+	/**
+	 * Méthode qui permet de calculer la valeur d'utilité d'une grille en comptant les alignements dans la
+	 * direction "slash" des jetons
+	 * @param grid Grille a analyser
+	 * @param isMax Boolean pour savoir si l'appelant est max ou pas
+	 * @return Une valeur entiere correspondant a la valeur d'utilité des alignements
+	 * en "slash" pour l'appelant
+	 */
 	public int checkSlashPourValeurUtilite(Grid grid, boolean isMax) {
 		int valeur = 0;
 		int countTokenBlue = 0;
@@ -524,16 +580,16 @@ public class Elagage { //alpha beta
 						if (grid.getCase(ligne2, colonne2) == "blue") {
 							countTokenBlue++;
 							if (countTokenBlue == 3 && !isMax) {
-								valeur += 200;
+								valeur += POSITIVE_3;
 							} else if (countTokenBlue == 2 && !isMax) {
 								valeur += 50;
 							}
 							if (countTokenBlue == 3 && isMax) {
-								valeur -= 500;
+								valeur += NEGATIVE_3_BIS;
 							} else if (countTokenBlue == 2 && isMax) {
-								valeur -= 50;
+								valeur += NEGATIVE_2;
 							} else if (countTokenBlue == 1 && isMax) {
-								valeur -= 5;
+								valeur += NEGATIVE_1;
 							}
 						} else if (grid.getCase(ligne2, colonne2) == "red") {
 							countTokenBlue = 0;
@@ -554,16 +610,16 @@ public class Elagage { //alpha beta
 						if (grid.getCase(ligne2, colonne2) == "blue") {
 							countTokenRed++;
 							if (countTokenRed == 3 && isMax) {
-								valeur += 200;
+								valeur += POSITIVE_3;
 							} else if (countTokenRed == 2 && isMax) {
 								valeur += 50;
 							}
 							if (countTokenRed == 3 && !isMax) {
-								valeur -= 500;
+								valeur += NEGATIVE_3_BIS;
 							} else if (countTokenRed == 2 && !isMax) {
-								valeur -= 50;
+								valeur += NEGATIVE_2;
 							} else if (countTokenRed == 1 && !isMax) {
-								valeur -= 5;
+								valeur += NEGATIVE_1;
 							}
 						} else if (grid.getCase(ligne2, colonne2) == "red") {
 							countTokenBlue = 0;
@@ -583,7 +639,14 @@ public class Elagage { //alpha beta
 		}
 		return valeur;
 	}
-
+	/**
+	 * Méthode qui permet de calculer la valeur d'utilité d'une grille en comptant les alignements dans la
+	 * direction "anti-slash" des jetons
+	 * @param grid Grille a analyser
+	 * @param isMax Boolean pour savoir si l'appelant est max ou pas
+	 * @return Une valeur entiere correspondant a la valeur d'utilité des alignements
+	 * en "anti-slash" pour l'appelant
+	 */
 	public int checkAntiSlashPourValeurUtilite(Grid grid, boolean isMax) {
 		int valeur = 0;
 		int countTokenBlue = 0;
@@ -605,16 +668,16 @@ public class Elagage { //alpha beta
 						if (grid.getCase(ligne2, colonne2) == "blue") {
 							countTokenBlue++;
 							if (countTokenRed == 3 && isMax) {
-								valeur += 200;
+								valeur += POSITIVE_3;
 							} else if (countTokenRed == 2 && isMax) {
 								valeur += 50;
 							}
 							if (countTokenRed == 3 && !isMax) {
-								valeur -= 500;
+								valeur += NEGATIVE_3_BIS;
 							} else if (countTokenRed == 2 && !isMax) {
-								valeur -= 50;
+								valeur += NEGATIVE_2;
 							} else if (countTokenRed == 1 && !isMax) {
-								valeur -= 5;
+								valeur += NEGATIVE_1;
 							}
 						} else if (grid.getCase(ligne2, colonne2) == "red") {
 							countTokenBlue = 0;
@@ -635,16 +698,16 @@ public class Elagage { //alpha beta
 						if (grid.getCase(ligne2, colonne2) == "blue") {
 							countTokenRed++;
 							if (countTokenRed == 3 && isMax) {
-								valeur += 200;
+								valeur += POSITIVE_3;
 							} else if (countTokenRed == 2 && isMax) {
 								valeur += 50;
 							}
 							if (countTokenRed == 3 && !isMax) {
-								valeur -= 500;
+								valeur += NEGATIVE_3_BIS;
 							} else if (countTokenRed == 2 && !isMax) {
-								valeur -= 50;
+								valeur += NEGATIVE_2;
 							} else if (countTokenRed == 1 && !isMax) {
-								valeur -= 5;
+								valeur += NEGATIVE_1;
 							}
 						} else if (grid.getCase(ligne2, colonne2) == "red") {
 							countTokenBlue = 0;
@@ -664,7 +727,12 @@ public class Elagage { //alpha beta
 		}
 		return valeur;
 	}
-
+	
+	/**
+	 * Une des quatre fonctions test, elle permet de regarder si il y a des alignements dans la direction "anti-slash"
+	 * @param grid La grille a tester
+	 * @return un boolean true s'il existe un alignement, false sinon
+	 */
 	public boolean checkAntiSlash(Grid grid) {
 		int countToken1 = 0;
 		int countToken2 = 0;
@@ -725,6 +793,14 @@ public class Elagage { //alpha beta
 		return false;
 	}
 
+	/**
+	 * Méthode qui retourne une heuristique basée sur les positions des jetons
+	 * @param grid Grille sur laquelle la méthode va calculer l'heuristique
+	 * @param isMax Boolean qui permet de savoir si c'est le tour de max ou non
+	 * @return Une heuristique basée sur le placement des jetons du joueur. Les points sont basés sur le nombre d'
+	 * alignement possible a ce point. La valeur de cet heuristique diminue au fur et a mesure qu'on avance
+	 * dans le jeu.
+	 */
 	public int heuristique2AlignementsGagnants(Grid grid, boolean isMax) {
 		int heurs = 0;
 		int nombreDeJetonsDansTableau=grid.nombreJetonDansTableau();
@@ -744,7 +820,10 @@ public class Elagage { //alpha beta
 		}
 		return heurs;
 	}
-
+	/**
+	 * 
+	 * @return L'état parent du tour en cours
+	 */
 	public Etat getEtatParent() {
 		return this.etatParent;
 	}
