@@ -262,6 +262,7 @@ public class GamePaneElagage extends HBox {
 							int index=etatEnfantsVector.size()-(random.nextInt(2)+1);
 							//prends au hasard un des 2 meilleurs états.
 							etatChoisi=etatEnfantsVector.get(index);
+							//etatChoisi=etatEnfantsVector.get(etatEnfantsVector.size()-1);
 						}
 						
 						
