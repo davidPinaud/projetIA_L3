@@ -23,7 +23,7 @@ public class Elagage { //alpha beta
 		this.profondeur = profondeur;
 		this.initialiserEtatEnfants(etatParent, this.profondeur, true); // initialisation des enfants d'etatParent
 		etatParent.setUtilite(this.elagageAlphaBeta(this.etatParent, this.profondeur, true,alpha,beta));
-		System.out.println(etatParent.getEnfants() + "===========================");
+		System.out.println("Positions Jouables"+etatParent.getEnfants() + "===========================");
 	}
 		
 	
@@ -78,7 +78,9 @@ public class Elagage { //alpha beta
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			etat.getEnfants().add(new Etat(this.game, gridBuffer));
+			Etat enfantEtat=new Etat(this.game, gridBuffer);
+			enfantEtat.setParent(etat);
+			etat.getEnfants().add(enfantEtat);
 		}
 
 		if (profondeur != 0) {
@@ -140,10 +142,10 @@ public class Elagage { //alpha beta
 		}
 
 		int slash, hori, verti, antiSlash, align;
-		antiSlash = this.checkAntiSlashPourValeurUtilite(etat.getGrid(), isMax);
-		hori = this.checkHoriPourValeurUtilite(etat.getGrid(), isMax);
-		verti = this.checkVertPourValeurUtilite(etat.getGrid(), isMax);
-		slash = this.checkSlashPourValeurUtilite(etat.getGrid(), isMax);
+		antiSlash = this.testAntiSlashPourValeurUtilite(etat.getGrid(), isMax);
+		hori = this.testHorizontalPourValeurUtilite(etat.getGrid(), isMax);
+		verti = this.testVerticalPourValeurUtilite(etat.getGrid(), isMax);
+		slash = this.testSlashPourValeurUtilite(etat.getGrid(), isMax);
 		align = this.heuristique2AlignementsGagnants(etat.getGrid(), isMax);
 
 		int valeurUtilite = slash + antiSlash + verti + hori + align;
@@ -174,20 +176,20 @@ public class Elagage { //alpha beta
 	 * @param isMax Boolean pour savoir si l'appelant est max ou pas
 	 * @return Une valeur entiere correspondant a la valeur d'utilité horizontale pour l'appelant
 	 */
-	public int checkHoriPourValeurUtilite(Grid grid, boolean isMax) {
+	public int testHorizontalPourValeurUtilite(Grid grid, boolean isMax) {
 		int valeur = 0;
-		int countTokenBlue = 0;
-		int countTokenRed = 0;
+		int nbTokenBlue = 0;
+		int nbTokenRed = 0;
 		int ligneNb = 0, colonneNb = 0;
 		for (String[] ligne : grid.getGrille()) {
 			for (String colonne : ligne) {
 				switch (colonne) {
 				case "blue": {
-					countTokenBlue++;
-					if (countTokenRed > 0) {
-						countTokenBlue = 0;
+					nbTokenBlue++;
+					if (nbTokenRed > 0) {
+						nbTokenBlue = 0;
 					}
-					if (countTokenBlue == 3 && !isMax) {//Si il y a trois jetons alignés horizontalement
+					if (nbTokenBlue == 3 && !isMax) {//Si il y a trois jetons alignés horizontalement
 						if (colonneNb + 1 <= 6) { //Si la prochaine case existe
 							if (grid.getCase(ligneNb, colonneNb + 1) == "") { //si la prochaine case est vide
 								//System.out.println("hey4");
@@ -212,10 +214,10 @@ public class Elagage { //alpha beta
 								}
 							}
 						}
-					} else if (countTokenBlue == 2 && !isMax) {
+					} else if (nbTokenBlue == 2 && !isMax) {
 						valeur += POSITIVE_2;
 					}
-					if (countTokenBlue == 3 && isMax) {
+					if (nbTokenBlue == 3 && isMax) {
 						if (colonneNb + 1 <= 6) {
 							if (grid.getCase(ligneNb, colonneNb + 1) == "") {
 								//System.out.println("hey1");
@@ -238,19 +240,19 @@ public class Elagage { //alpha beta
 								}
 							}
 						}
-					} else if (countTokenBlue == 2 && isMax) {
+					} else if (nbTokenBlue == 2 && isMax) {
 						valeur += NEGATIVE_2;
-					} else if (countTokenBlue == 1 && isMax) {
+					} else if (nbTokenBlue == 1 && isMax) {
 						valeur += NEGATIVE_1;
 					}
 					break;
 				}
 				case "red": {
-					countTokenRed++;
-					if (countTokenBlue > 0) {
-						countTokenRed = 0;
+					nbTokenRed++;
+					if (nbTokenBlue > 0) {
+						nbTokenRed = 0;
 					}
-					if (countTokenRed == 3 && isMax) {
+					if (nbTokenRed == 3 && isMax) {
 						if (colonneNb + 1 <= 6) {
 							if (grid.getCase(ligneNb, colonneNb + 1) == "") {
 								valeur += POSITIVE_3;
@@ -270,10 +272,10 @@ public class Elagage { //alpha beta
 								}
 							}
 						}
-					} else if (countTokenRed == 2 && isMax) {
+					} else if (nbTokenRed == 2 && isMax) {
 						valeur += POSITIVE_2;
 					}
-					if (countTokenRed == 3 && !isMax) {
+					if (nbTokenRed == 3 && !isMax) {
 						if (colonneNb + 1 <= 6) {
 							if (grid.getCase(ligneNb, colonneNb + 1) == "") {
 								valeur += NEGATIVE_3;
@@ -293,16 +295,16 @@ public class Elagage { //alpha beta
 								}
 							}
 						}
-					} else if (countTokenRed == 2 && !isMax) {
+					} else if (nbTokenRed == 2 && !isMax) {
 						valeur += NEGATIVE_2;
-					} else if (countTokenRed == 1 && !isMax) {
+					} else if (nbTokenRed == 1 && !isMax) {
 						valeur += NEGATIVE_1;
 					}
 					break;
 				}
 				default: {
-					countTokenBlue = 0;
-					countTokenRed = 0;
+					nbTokenBlue = 0;
+					nbTokenRed = 0;
 					break;
 				}
 				}
@@ -320,7 +322,7 @@ public class Elagage { //alpha beta
 	 * @return un boolean true si le jeu est fini, false sinon
 	 */
 	public boolean isFinished(Grid grid) {
-		if (this.checkHori(grid) || this.checkVert(grid) || this.checkSlash(grid) || this.checkAntiSlash(grid)) {
+		if (this.testHorizontal(grid) || this.testVertical(grid) || this.testSlash(grid) || this.testAntiSlash(grid)) {
 			return true;
 		}
 		return false;
@@ -330,35 +332,35 @@ public class Elagage { //alpha beta
 	 * @param grid La grille a tester
 	 * @return un boolean true s'il existe un alignement, false sinon
 	 */
-	public boolean checkHori(Grid grid) {
-		int countToken1 = 0;
-		int countToken2 = 0;
+	public boolean testHorizontal(Grid grid) {
+		int nbTokenRed = 0;
+		int nbTokenBlue = 0;
 		for (String[] i : grid.getGrille()) {
 			for (String i2 : i) {
 				switch (i2) {
 				case "blue":
-					if (countToken2 > 0)
-						countToken2 = 0;
-					countToken1++;
-					if (countToken1 >= 4 || countToken2 >= 4) {
+					if (nbTokenBlue > 0)
+						nbTokenBlue = 0;
+					nbTokenRed++;
+					if (nbTokenRed >= 4 || nbTokenBlue >= 4) {
 						return true;
 					}
 					break;
 				case "red":
-					if (countToken1 > 0)
-						countToken1 = 0;
-					countToken2++;
-					if (countToken1 >= 4 || countToken2 >= 4) {
+					if (nbTokenRed > 0)
+						nbTokenRed = 0;
+					nbTokenBlue++;
+					if (nbTokenRed >= 4 || nbTokenBlue >= 4) {
 						return true;
 					}
 					break;
 				default:
-					countToken1 = 0;
-					countToken2 = 0;
+					nbTokenRed = 0;
+					nbTokenBlue = 0;
 				}
 			}
-			countToken1 = 0;
-			countToken2 = 0;
+			nbTokenRed = 0;
+			nbTokenBlue = 0;
 		}
 
 		return false;
@@ -370,19 +372,19 @@ public class Elagage { //alpha beta
 	 * @param isMax Boolean pour savoir si l'appelant est max ou pas
 	 * @return Une valeur entiere correspondant a la valeur d'utilité verticale pour l'appelant
 	 */
-	public int checkVertPourValeurUtilite(Grid grid, boolean isMax) {
+	public int testVerticalPourValeurUtilite(Grid grid, boolean isMax) {
 		int valeur = 0;
-		int countTokenBlue = 0;
-		int countTokenRed = 0;
+		int nbTokenBlue = 0;
+		int nbTokenRed = 0;
 		for (int colonne = 0; colonne <= grid.getNB_COLONNE(); colonne++) {
 			for (int ligne = 0; ligne <= grid.getNB_LIGNE(); ligne++) {
 				switch (grid.getCase(ligne, colonne)) {
 				case "blue": {
-					countTokenBlue++;
-					if (countTokenRed > 0) {
-						countTokenBlue = 0;
+					nbTokenBlue++;
+					if (nbTokenRed > 0) {
+						nbTokenBlue = 0;
 					}
-					if (countTokenBlue == 3 && !isMax) {
+					if (nbTokenBlue == 3 && !isMax) {
 						if (ligne - 3 >= 0) {
 							if (grid.getCase(ligne - 3, colonne) == "") {
 								valeur += POSITIVE_3;
@@ -390,10 +392,10 @@ public class Elagage { //alpha beta
 						} else {
 							valeur -= 0;
 						}
-					} else if (countTokenBlue == 2 && !isMax) {
+					} else if (nbTokenBlue == 2 && !isMax) {
 						valeur += 50;
 					}
-					if (countTokenBlue == 3 && isMax) {
+					if (nbTokenBlue == 3 && isMax) {
 						if (ligne - 3 >= 0) {
 							if (grid.getCase(ligne - 3, colonne) == "") {
 								valeur += NEGATIVE_3_BIS;
@@ -401,19 +403,19 @@ public class Elagage { //alpha beta
 						} else {
 							valeur -= 0;
 						}
-					} else if (countTokenBlue == 2 && isMax) {
+					} else if (nbTokenBlue == 2 && isMax) {
 						valeur += NEGATIVE_2;
-					} else if (countTokenBlue == 1 && isMax) {
+					} else if (nbTokenBlue == 1 && isMax) {
 						valeur += NEGATIVE_1;
 					}
 					break;
 				}
 				case "red": {
-					countTokenRed++;
-					if (countTokenBlue > 0) {
-						countTokenRed = 0;
+					nbTokenRed++;
+					if (nbTokenBlue > 0) {
+						nbTokenRed = 0;
 					}
-					if (countTokenRed == 3 && isMax) {
+					if (nbTokenRed == 3 && isMax) {
 						if (ligne - 3 >= 0) {
 							if (grid.getCase(ligne - 3, colonne) == "") {
 								valeur += POSITIVE_3;
@@ -422,10 +424,10 @@ public class Elagage { //alpha beta
 							valeur -= 0;
 						}
 						;
-					} else if (countTokenRed == 2 && isMax) {
+					} else if (nbTokenRed == 2 && isMax) {
 						valeur += 50;
 					}
-					if (countTokenRed == 3 && !isMax) {
+					if (nbTokenRed == 3 && !isMax) {
 						if (ligne - 3 >= 0) {
 							if (grid.getCase(ligne - 3, colonne) == "") {
 								valeur += NEGATIVE_3_BIS;
@@ -433,16 +435,16 @@ public class Elagage { //alpha beta
 						} else {
 							valeur -= 0;
 						}
-					} else if (countTokenRed == 2 && !isMax) {
+					} else if (nbTokenRed == 2 && !isMax) {
 						valeur += NEGATIVE_2;
-					} else if (countTokenRed == 1 && !isMax) {
+					} else if (nbTokenRed == 1 && !isMax) {
 						valeur += NEGATIVE_1;
 					}
 					break;
 				}
 				default: {
-					countTokenBlue = 0;
-					countTokenRed = 0;
+					nbTokenBlue = 0;
+					nbTokenRed = 0;
 					break;
 				}
 				}
@@ -455,35 +457,35 @@ public class Elagage { //alpha beta
 	 * @param grid La grille a tester
 	 * @return un boolean true s'il existe un alignement, false sinon
 	 */
-	public boolean checkVert(Grid grid) {
-		int countToken1 = 0;
-		int countToken2 = 0;
+	public boolean testVertical(Grid grid) {
+		int nbTokenRed = 0;
+		int nbTokenBlue = 0;
 		for (int c = 0; c <= grid.getNB_COLONNE(); c++) {
 			for (int l = 0; l <= grid.getNB_LIGNE(); l++) {
 				switch (grid.getCase(l, c)) {
 				case "blue":
-					if (countToken2 > 0)
-						countToken2 = 0;
-					countToken1++;
-					if (countToken1 >= 4 || countToken2 >= 4) {
+					if (nbTokenBlue > 0)
+						nbTokenBlue = 0;
+					nbTokenRed++;
+					if (nbTokenRed >= 4 || nbTokenBlue >= 4) {
 						return true;
 					}
 					break;
 				case "red":
-					if (countToken1 > 0)
-						countToken1 = 0;
-					countToken2++;
-					if (countToken1 >= 4 || countToken2 >= 4) {
+					if (nbTokenRed > 0)
+						nbTokenRed = 0;
+					nbTokenBlue++;
+					if (nbTokenRed >= 4 || nbTokenBlue >= 4) {
 						return true;
 					}
 					break;
 				default:
-					countToken1 = 0;
-					countToken2 = 0;
+					nbTokenRed = 0;
+					nbTokenBlue = 0;
 				}
 			}
-			countToken1 = 0;
-			countToken2 = 0;
+			nbTokenRed = 0;
+			nbTokenBlue = 0;
 		}
 		return false;
 	}
@@ -492,62 +494,62 @@ public class Elagage { //alpha beta
 	 * @param grid La grille a tester
 	 * @return un boolean true s'il existe un alignement, false sinon
 	 */
-	public boolean checkSlash(Grid grid) {
-		int countToken1 = 0;
-		int countToken2 = 0;
+	public boolean testSlash(Grid grid) {
+		int nbTokenRed = 0;
+		int nbTokenBlue = 0;
 		int c2, l2;
 		for (int l = 3; l <= grid.getNB_LIGNE(); l++) {
 			for (int c = 0; c <= 3; c++) {
 				switch (grid.getCase(l, c)) {
 				case "blue":
-					countToken1 = 0;
-					if (countToken2 > 0)
-						countToken2 = 0;
-					countToken1++;
+					nbTokenRed = 0;
+					if (nbTokenBlue > 0)
+						nbTokenBlue = 0;
+					nbTokenRed++;
 					c2 = c;
 					l2 = l;
 					for (int i = 1; i < 4; i++) {
 						c2++;
 						l2--;
 						if (grid.getCase(l2, c2) == "blue")
-							countToken1++;
+							nbTokenRed++;
 						else if (grid.getCase(l2, c2) != "red") {
-							countToken1 = 0;
+							nbTokenRed = 0;
 							break;
 						}
 					}
-					if (countToken1 >= 4 || countToken2 >= 4) {
+					if (nbTokenRed >= 4 || nbTokenBlue >= 4) {
 						return true;
 					}
 					break;
 				case "red":
-					countToken2 = 0;
-					if (countToken1 > 0)
-						countToken1 = 0;
-					countToken2++;
+					nbTokenBlue = 0;
+					if (nbTokenRed > 0)
+						nbTokenRed = 0;
+					nbTokenBlue++;
 					c2 = c;
 					l2 = l;
 					for (int i = 1; i < 4; i++) {
 						c2++;
 						l2--;
 						if (grid.getCase(l2, c2) == "red")
-							countToken2++;
+							nbTokenBlue++;
 						else if (grid.getCase(l2, c2) != "blue") {
-							countToken2 = 0;
+							nbTokenBlue = 0;
 							break;
 						}
 					}
-					if (countToken1 >= 4 || countToken2 >= 4) {
+					if (nbTokenRed >= 4 || nbTokenBlue >= 4) {
 						return true;
 					}
 					break;
 				default:
-					countToken1 = 0;
-					countToken2 = 0;
+					nbTokenRed = 0;
+					nbTokenBlue = 0;
 				}
 			}
-			countToken1 = 0;
-			countToken2 = 0;
+			nbTokenRed = 0;
+			nbTokenBlue = 0;
 		}
 		return false;
 	}
@@ -559,18 +561,18 @@ public class Elagage { //alpha beta
 	 * @return Une valeur entiere correspondant a la valeur d'utilité des alignements
 	 * en "slash" pour l'appelant
 	 */
-	public int checkSlashPourValeurUtilite(Grid grid, boolean isMax) {
+	public int testSlashPourValeurUtilite(Grid grid, boolean isMax) {
 		int valeur = 0;
-		int countTokenBlue = 0;
-		int countTokenRed = 0;
+		int nbTokenBlue = 0;
+		int nbTokenRed = 0;
 		int ligne2, colonne2;
 		for (int ligne = 3; ligne <= grid.getNB_LIGNE(); ligne++) {
 			for (int colonne = 0; colonne <= 3; colonne++) {
 				switch (grid.getCase(ligne, colonne)) {
 				case "blue": {
-					countTokenBlue = 1;
-					if (countTokenRed > 0) {
-						countTokenRed = 0;
+					nbTokenBlue = 1;
+					if (nbTokenRed > 0) {
+						nbTokenRed = 0;
 					}
 					ligne2 = ligne;
 					colonne2 = colonne;
@@ -578,29 +580,29 @@ public class Elagage { //alpha beta
 						ligne2--;
 						colonne2++;
 						if (grid.getCase(ligne2, colonne2) == "blue") {
-							countTokenBlue++;
-							if (countTokenBlue == 3 && !isMax) {
+							nbTokenBlue++;
+							if (nbTokenBlue == 3 && !isMax) {
 								valeur += POSITIVE_3;
-							} else if (countTokenBlue == 2 && !isMax) {
+							} else if (nbTokenBlue == 2 && !isMax) {
 								valeur += 50;
 							}
-							if (countTokenBlue == 3 && isMax) {
+							if (nbTokenBlue == 3 && isMax) {
 								valeur += NEGATIVE_3_BIS;
-							} else if (countTokenBlue == 2 && isMax) {
+							} else if (nbTokenBlue == 2 && isMax) {
 								valeur += NEGATIVE_2;
-							} else if (countTokenBlue == 1 && isMax) {
+							} else if (nbTokenBlue == 1 && isMax) {
 								valeur += NEGATIVE_1;
 							}
 						} else if (grid.getCase(ligne2, colonne2) == "red") {
-							countTokenBlue = 0;
+							nbTokenBlue = 0;
 						}
 					}
 					break;
 				}
 				case "red": {
-					countTokenRed = 1;
-					if (countTokenBlue > 0) {
-						countTokenBlue = 0;
+					nbTokenRed = 1;
+					if (nbTokenBlue > 0) {
+						nbTokenBlue = 0;
 					}
 					ligne2 = ligne;
 					colonne2 = colonne;
@@ -608,34 +610,34 @@ public class Elagage { //alpha beta
 						ligne2--;
 						colonne2++;
 						if (grid.getCase(ligne2, colonne2) == "blue") {
-							countTokenRed++;
-							if (countTokenRed == 3 && isMax) {
+							nbTokenRed++;
+							if (nbTokenRed == 3 && isMax) {
 								valeur += POSITIVE_3;
-							} else if (countTokenRed == 2 && isMax) {
+							} else if (nbTokenRed == 2 && isMax) {
 								valeur += 50;
 							}
-							if (countTokenRed == 3 && !isMax) {
+							if (nbTokenRed == 3 && !isMax) {
 								valeur += NEGATIVE_3_BIS;
-							} else if (countTokenRed == 2 && !isMax) {
+							} else if (nbTokenRed == 2 && !isMax) {
 								valeur += NEGATIVE_2;
-							} else if (countTokenRed == 1 && !isMax) {
+							} else if (nbTokenRed == 1 && !isMax) {
 								valeur += NEGATIVE_1;
 							}
 						} else if (grid.getCase(ligne2, colonne2) == "red") {
-							countTokenBlue = 0;
+							nbTokenBlue = 0;
 						}
 					}
 					break;
 				}
 				default: {
-					countTokenBlue = 0;
-					countTokenRed = 0;
+					nbTokenBlue = 0;
+					nbTokenRed = 0;
 				}
 				}
 
 			}
-			countTokenBlue = 0;
-			countTokenRed = 0;
+			nbTokenBlue = 0;
+			nbTokenRed = 0;
 		}
 		return valeur;
 	}
@@ -647,18 +649,18 @@ public class Elagage { //alpha beta
 	 * @return Une valeur entiere correspondant a la valeur d'utilité des alignements
 	 * en "anti-slash" pour l'appelant
 	 */
-	public int checkAntiSlashPourValeurUtilite(Grid grid, boolean isMax) {
+	public int testAntiSlashPourValeurUtilite(Grid grid, boolean isMax) {
 		int valeur = 0;
-		int countTokenBlue = 0;
-		int countTokenRed = 0;
+		int nbTokenBlue = 0;
+		int nbTokenRed = 0;
 		int ligne2, colonne2;
 		for (int ligne = 3; ligne <= grid.getNB_LIGNE(); ligne++) {
 			for (int colonne = 3; colonne <= grid.getNB_COLONNE(); colonne++) {
 				switch (grid.getCase(ligne, colonne)) {
 				case "blue": {
-					countTokenBlue = 1;
-					if (countTokenRed > 0) {
-						countTokenRed = 0;
+					nbTokenBlue = 1;
+					if (nbTokenRed > 0) {
+						nbTokenRed = 0;
 					}
 					ligne2 = ligne;
 					colonne2 = colonne;
@@ -666,29 +668,29 @@ public class Elagage { //alpha beta
 						ligne2--;
 						colonne2--;
 						if (grid.getCase(ligne2, colonne2) == "blue") {
-							countTokenBlue++;
-							if (countTokenRed == 3 && isMax) {
+							nbTokenBlue++;
+							if (nbTokenRed == 3 && isMax) {
 								valeur += POSITIVE_3;
-							} else if (countTokenRed == 2 && isMax) {
+							} else if (nbTokenRed == 2 && isMax) {
 								valeur += 50;
 							}
-							if (countTokenRed == 3 && !isMax) {
+							if (nbTokenRed == 3 && !isMax) {
 								valeur += NEGATIVE_3_BIS;
-							} else if (countTokenRed == 2 && !isMax) {
+							} else if (nbTokenRed == 2 && !isMax) {
 								valeur += NEGATIVE_2;
-							} else if (countTokenRed == 1 && !isMax) {
+							} else if (nbTokenRed == 1 && !isMax) {
 								valeur += NEGATIVE_1;
 							}
 						} else if (grid.getCase(ligne2, colonne2) == "red") {
-							countTokenBlue = 0;
+							nbTokenBlue = 0;
 						}
 					}
 					break;
 				}
 				case "red": {
-					countTokenRed = 1;
-					if (countTokenBlue > 0) {
-						countTokenBlue = 0;
+					nbTokenRed = 1;
+					if (nbTokenBlue > 0) {
+						nbTokenBlue = 0;
 					}
 					ligne2 = ligne;
 					colonne2 = colonne;
@@ -696,34 +698,34 @@ public class Elagage { //alpha beta
 						ligne2--;
 						colonne2--;
 						if (grid.getCase(ligne2, colonne2) == "blue") {
-							countTokenRed++;
-							if (countTokenRed == 3 && isMax) {
+							nbTokenRed++;
+							if (nbTokenRed == 3 && isMax) {
 								valeur += POSITIVE_3;
-							} else if (countTokenRed == 2 && isMax) {
+							} else if (nbTokenRed == 2 && isMax) {
 								valeur += 50;
 							}
-							if (countTokenRed == 3 && !isMax) {
+							if (nbTokenRed == 3 && !isMax) {
 								valeur += NEGATIVE_3_BIS;
-							} else if (countTokenRed == 2 && !isMax) {
+							} else if (nbTokenRed == 2 && !isMax) {
 								valeur += NEGATIVE_2;
-							} else if (countTokenRed == 1 && !isMax) {
+							} else if (nbTokenRed == 1 && !isMax) {
 								valeur += NEGATIVE_1;
 							}
 						} else if (grid.getCase(ligne2, colonne2) == "red") {
-							countTokenBlue = 0;
+							nbTokenBlue = 0;
 						}
 					}
 					break;
 				}
 				default: {
-					countTokenBlue = 0;
-					countTokenRed = 0;
+					nbTokenBlue = 0;
+					nbTokenRed = 0;
 				}
 				}
 
 			}
-			countTokenBlue = 0;
-			countTokenRed = 0;
+			nbTokenBlue = 0;
+			nbTokenRed = 0;
 		}
 		return valeur;
 	}
@@ -733,62 +735,62 @@ public class Elagage { //alpha beta
 	 * @param grid La grille a tester
 	 * @return un boolean true s'il existe un alignement, false sinon
 	 */
-	public boolean checkAntiSlash(Grid grid) {
-		int countToken1 = 0;
-		int countToken2 = 0;
+	public boolean testAntiSlash(Grid grid) {
+		int nbTokenRed = 0;
+		int nbTokenBlue = 0;
 		int c2, l2;
 		for (int l = 3; l <= grid.getNB_LIGNE(); l++) {
 			for (int c = 3; c <= grid.getNB_COLONNE(); c++) {
 				switch (grid.getCase(l, c)) {
 				case "blue":
-					countToken1 = 0;
-					if (countToken2 > 0)
-						countToken2 = 0;
-					countToken1++;
+					nbTokenRed = 0;
+					if (nbTokenBlue > 0)
+						nbTokenBlue = 0;
+					nbTokenRed++;
 					c2 = c;
 					l2 = l;
 					for (int i = 1; i < 4; i++) {
 						c2--;
 						l2--;
 						if (grid.getCase(l2, c2) == "blue")
-							countToken1++;
+							nbTokenRed++;
 						else if (grid.getCase(l2, c2) != "blue") {
-							countToken1 = 0;
+							nbTokenRed = 0;
 							break;
 						}
 					}
-					if (countToken1 >= 4 || countToken2 >= 4) {
+					if (nbTokenRed >= 4 || nbTokenBlue >= 4) {
 						return true;
 					}
 					break;
 				case "red":
-					countToken2 = 0;
-					if (countToken1 > 0)
-						countToken1 = 0;
-					countToken2++;
+					nbTokenBlue = 0;
+					if (nbTokenRed > 0)
+						nbTokenRed = 0;
+					nbTokenBlue++;
 					c2 = c;
 					l2 = l;
 					for (int i = 1; i < 4; i++) {
 						c2--;
 						l2--;
 						if (grid.getCase(l2, c2) == "red")
-							countToken2++;
+							nbTokenBlue++;
 						else if (grid.getCase(l2, c2) != "red") {
-							countToken2 = 0;
+							nbTokenBlue = 0;
 							break;
 						}
 					}
-					if (countToken1 >= 4 || countToken2 >= 4) {
+					if (nbTokenRed >= 4 || nbTokenBlue >= 4) {
 						return true;
 					}
 					break;
 				default:
-					countToken1 = 0;
-					countToken2 = 0;
+					nbTokenRed = 0;
+					nbTokenBlue = 0;
 				}
 			}
-			countToken1 = 0;
-			countToken2 = 0;
+			nbTokenRed = 0;
+			nbTokenBlue = 0;
 		}
 		return false;
 	}
@@ -804,7 +806,7 @@ public class Elagage { //alpha beta
 	public int heuristique2AlignementsGagnants(Grid grid, boolean isMax) {
 		int heurs = 0;
 		int nombreDeJetonsDansTableau=grid.nombreJetonDansTableau();
-		int facteur=(nombreDeJetonsDansTableau==0?20:20/nombreDeJetonsDansTableau);
+		int facteur=(nombreDeJetonsDansTableau==0?10:10/nombreDeJetonsDansTableau);
 		for (int l = 0; l < 6; l++) {
 			for (int c = 0; c < 7; c++) {
 				if (grid.getCase(l, c).equals("blue") && isMax) {

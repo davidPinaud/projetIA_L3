@@ -43,7 +43,7 @@ public class Game {
 	 * @return un boolean qui détermine si le jeu est fini
 	 */
 	public boolean isFinished() {
-		if(this.checkHori() || this.checkVert() || this.checkSlash() || this.checkAntiSlash()) {
+		if(this.testHorizontal() || this.testVertical() || this.testSlash() || this.testAntiSlash()) {
 			return true;
 		}
 		return false;
@@ -56,10 +56,10 @@ public class Game {
 	 * @param grid La grille a tester
 	 * @return un boolean true s'il existe un alignement, false sinon
 	 */
-	public boolean checkHori()
+	public boolean testHorizontal()
 	{
-		int countToken1 = 0;
-		int countToken2 = 0;
+		int nbTokenRed = 0;
+		int nbTokenBlue = 0;
 		for(String[] i : grid.getGrille())
 		{
 			for(String i2 : i )
@@ -67,30 +67,30 @@ public class Game {
 				switch (i2)
 				{
 					case "blue":
-						if(countToken2 > 0)
-							countToken2 = 0;
-						countToken1++;
-						if(countToken1 >= 4 || countToken2 >= 4)
+						if(nbTokenBlue > 0)
+							nbTokenBlue = 0;
+						nbTokenRed++;
+						if(nbTokenRed >= 4 || nbTokenBlue >= 4)
 						{
 							return true;
 						}
 						break;
 					case "red":
-						if(countToken1 > 0)
-							countToken1 = 0;
-						countToken2++;
-						if(countToken1 >= 4 || countToken2 >= 4)
+						if(nbTokenRed > 0)
+							nbTokenRed = 0;
+						nbTokenBlue++;
+						if(nbTokenRed >= 4 || nbTokenBlue >= 4)
 						{
 							return true;
 						}
 						break;
 					default:
-						countToken1 = 0;
-						countToken2 = 0;
+						nbTokenRed = 0;
+						nbTokenBlue = 0;
 				}
 			}
-			countToken1 = 0;
-			countToken2 = 0;
+			nbTokenRed = 0;
+			nbTokenBlue = 0;
 		}
 
 		return false;
@@ -100,10 +100,10 @@ public class Game {
 	 * @param grid La grille a tester
 	 * @return un boolean true s'il existe un alignement, false sinon
 	 */
-	public boolean checkVert()
+	public boolean testVertical()
 	{
-		int countToken1 = 0;
-		int countToken2 = 0;
+		int nbTokenRed = 0;
+		int nbTokenBlue = 0;
 		for(int c = 0; c<= grid.getNB_COLONNE(); c++)
 		{
 			for(int l = 0; l<= grid.getNB_LIGNE(); l++)
@@ -111,30 +111,30 @@ public class Game {
 				switch (grid.getCase(l, c))
 				{
 					case "blue":
-						if(countToken2 > 0)
-							countToken2 = 0;
-						countToken1++;
-						if(countToken1 >= 4 || countToken2 >= 4)
+						if(nbTokenBlue > 0)
+							nbTokenBlue = 0;
+						nbTokenRed++;
+						if(nbTokenRed >= 4 || nbTokenBlue >= 4)
 						{
 							return true;
 						}
 						break;
 					case "red":
-						if(countToken1 > 0)
-							countToken1 = 0;
-						countToken2++;
-						if(countToken1 >= 4 || countToken2 >= 4)
+						if(nbTokenRed > 0)
+							nbTokenRed = 0;
+						nbTokenBlue++;
+						if(nbTokenRed >= 4 || nbTokenBlue >= 4)
 						{
 							return true;
 						}
 						break;
 					default:
-						countToken1 = 0;
-						countToken2 = 0;
+						nbTokenRed = 0;
+						nbTokenBlue = 0;
 				}
 			}
-			countToken1 = 0;
-			countToken2 = 0;
+			nbTokenRed = 0;
+			nbTokenBlue = 0;
 		}
 		return false;
 	}
@@ -143,10 +143,10 @@ public class Game {
 	 * @param grid La grille a tester
 	 * @return un boolean true s'il existe un alignement, false sinon
 	 */
-	public boolean checkSlash()
+	public boolean testSlash()
 	{
-		int countToken1 = 0;
-		int countToken2 = 0;
+		int nbTokenRed = 0;
+		int nbTokenBlue = 0;
 		int c2,l2;
 		for(int l = 3; l <= grid.getNB_LIGNE(); l++)
 		{
@@ -155,10 +155,10 @@ public class Game {
 				switch (grid.getCase(l, c))
 				{
 					case "blue":
-						countToken1 = 0;
-						if(countToken2 > 0)
-							countToken2 = 0;
-						countToken1++;
+						nbTokenRed = 0;
+						if(nbTokenBlue > 0)
+							nbTokenBlue = 0;
+						nbTokenRed++;
 						c2 = c;
 						l2 = l;
 						for(int i = 1; i < 4; i++ )
@@ -166,23 +166,23 @@ public class Game {
 							c2++;
 							l2--;
 							if(grid.getCase(l2, c2) == "blue")
-								countToken1++;
+								nbTokenRed++;
 							else if(grid.getCase(l2, c2) != "red")
 							{
-								countToken1 = 0;
+								nbTokenRed = 0;
 								break;
 							}
 						}
-						if(countToken1 >= 4 || countToken2 >= 4)
+						if(nbTokenRed >= 4 || nbTokenBlue >= 4)
 						{
 							return true;
 						}
 						break;
 					case "red":
-						countToken2 = 0;
-						if(countToken1 > 0)
-							countToken1 = 0;
-						countToken2++;
+						nbTokenBlue = 0;
+						if(nbTokenRed > 0)
+							nbTokenRed = 0;
+						nbTokenBlue++;
 						c2 = c;
 						l2 = l;
 						for(int i = 1; i < 4; i++ )
@@ -190,25 +190,25 @@ public class Game {
 							c2++;
 							l2--;
 							if(grid.getCase(l2, c2) == "red")
-								countToken2++;
+								nbTokenBlue++;
 							else if(grid.getCase(l2, c2) !=  "blue")
 							{
-								countToken2 = 0;
+								nbTokenBlue = 0;
 								break;
 							}
 						}
-						if(countToken1 >= 4 || countToken2 >= 4)
+						if(nbTokenRed >= 4 || nbTokenBlue >= 4)
 						{
 							return true;
 						}
 						break;
 					default:
-						countToken1 = 0;
-						countToken2 = 0;
+						nbTokenRed = 0;
+						nbTokenBlue = 0;
 				}
 			}
-			countToken1 = 0;
-			countToken2 = 0;
+			nbTokenRed = 0;
+			nbTokenBlue = 0;
 		}
 		return false;
 	}
@@ -217,10 +217,10 @@ public class Game {
 	 * @param grid La grille a tester
 	 * @return un boolean true s'il existe un alignement, false sinon
 	 */
-	public boolean checkAntiSlash()
+	public boolean testAntiSlash()
 	{
-		int countToken1 = 0;
-		int countToken2 = 0;
+		int nbTokenRed = 0;
+		int nbTokenBlue = 0;
 		int c2,l2;
 		for(int l = 3; l <= grid.getNB_LIGNE(); l++)
 		{
@@ -229,10 +229,10 @@ public class Game {
 				switch (grid.getCase(l, c))
 				{
 					case "blue":
-						countToken1 = 0;
-						if(countToken2 > 0)
-							countToken2 = 0;
-						countToken1++;
+						nbTokenRed = 0;
+						if(nbTokenBlue > 0)
+							nbTokenBlue = 0;
+						nbTokenRed++;
 						c2 = c;
 						l2 = l;
 						for(int i = 1; i < 4; i++ )
@@ -240,23 +240,23 @@ public class Game {
 							c2--;
 							l2--;
 							if(grid.getCase(l2, c2) == "blue")
-								countToken1++;
+								nbTokenRed++;
 							else if(grid.getCase(l2, c2) != "blue")
 							{
-								countToken1 = 0;
+								nbTokenRed = 0;
 								break;
 							}
 						}
-						if(countToken1 >= 4 || countToken2 >= 4)
+						if(nbTokenRed >= 4 || nbTokenBlue >= 4)
 						{
 							return true;
 						}
 						break;
 					case "red":
-						countToken2 = 0;
-						if(countToken1 > 0)
-							countToken1 = 0;
-						countToken2++;
+						nbTokenBlue = 0;
+						if(nbTokenRed > 0)
+							nbTokenRed = 0;
+						nbTokenBlue++;
 						c2 = c;
 						l2 = l;
 						for(int i = 1; i < 4; i++ )
@@ -264,25 +264,25 @@ public class Game {
 							c2--;
 							l2--;
 							if(grid.getCase(l2, c2) == "red")
-								countToken2++;
+								nbTokenBlue++;
 							else if(grid.getCase(l2, c2) != "red")
 							{
-								countToken2 = 0;
+								nbTokenBlue = 0;
 								break;
 							}
 						}
-						if(countToken1 >= 4 || countToken2 >= 4)
+						if(nbTokenRed >= 4 || nbTokenBlue >= 4)
 						{
 							return true;
 						}
 						break;
 					default:
-						countToken1 = 0;
-						countToken2 = 0;
+						nbTokenRed = 0;
+						nbTokenBlue = 0;
 				}
 			}
-			countToken1 = 0;
-			countToken2 = 0;
+			nbTokenRed = 0;
+			nbTokenBlue = 0;
 		}
 		return false;
 	}

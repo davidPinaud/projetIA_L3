@@ -237,7 +237,7 @@ public class GamePaneMinMax extends HBox {
 						
 						// on regarde les différences entre les grilles du jeu et celui de l'état
 						// suivant
-						System.out.println("etat choisi " + etatChoisi + "\n------------------");
+						System.out.println("etat choisi " + etatChoisi + "\n------------------------------------------------------------------");
 						int ligneIA = 0, colonneIA = 0;
 						Grid gridEnfant = etatChoisi.getGrid();
 						for (int lig = 0; lig <= gridEnfant.getNB_LIGNE(); lig++) {

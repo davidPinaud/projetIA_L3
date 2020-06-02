@@ -18,8 +18,7 @@ public class Grid {
 			{ "", "", "", "", "", "", "" },
 			{ "", "", "", "", "", "", "" } };
 
-	private final int NB_LIGNE = 5;
-	private final int NB_COLONNE = 6;
+	
 
 
 	public Grid() {
@@ -122,5 +121,7 @@ public class Grid {
 			}
 		}
 	}
+	private final int NB_LIGNE = 5;
+	private final int NB_COLONNE = 6;
 
 }

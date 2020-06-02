@@ -9,7 +9,7 @@ import java.util.Vector;
  *
  */
 public class Etat {
-	private Etat parent; //Son état parent s'il en a un
+	private Etat parent=null; //Son état parent s'il en a un
 	private List<Etat> enfants = new Vector<Etat>(); // ses enfants s'il en a
 	Game game; // Le jeu auquel cet Etat peut appartenir
 	Grid grid; // La grille associé a cet etat
@@ -78,9 +78,14 @@ public class Etat {
 	 */
 	@Override
 	public String toString() {
-		return "\nutilité : " + utilite + "\ngrid : \n" + grid.toString() + "\n" + "antislash" + this.getAntislash()
-				+ "\nhorizontale" + this.getHorizontale() + "\nvertical" + this.getVertical() + "\nslash"
-				+ this.getSlash() + "\nalignement 2 : "+this.getHeuristique2Alignement()+ "\n\n";
+		if(this.parent==null) {
+			return "\ngrid : \n" + grid.toString()+ "\n\n";
+		}else {
+			
+		return "\n\nutilité : " + utilite + "\ngrid : \n" + grid.toString() + "\n" + "antislash : " + this.getAntislash()
+				+ "\nhorizontale : " + this.getHorizontale() + "\nvertical : " + this.getVertical() + "\nslash : "
+				+ this.getSlash() + "\nalignement : "+this.getHeuristique2Alignement()+ "\n\n";
+		}
 	}
 
 	public int getSlash() {
