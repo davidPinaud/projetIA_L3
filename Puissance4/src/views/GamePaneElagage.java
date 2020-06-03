@@ -294,6 +294,8 @@ public class GamePaneElagage extends HBox {
 							quiAGagne.setText(pseudo2 + " a gagné");
 							quiAGagne.setFont(Font.font("Verdana", 30));
 							game.getPlayer2().incrementScore(1);
+							scorePlayer1.setText(pseudo1 + " : " + game.getPlayer1().getScore());
+							scorePlayer2.setText(pseudo2 + " : " + game.getPlayer2().getScore());
 							Alert alert = new Alert(AlertType.CONFIRMATION);
 							alert.setTitle("Partie terminée");
 							alert.setHeaderText(pseudo2 + " a gagné");
